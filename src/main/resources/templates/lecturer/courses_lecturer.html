@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>lecturer set requirements</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/lecturers/index_lecturer">Index</a>
+    <a href="/lecturers/requirements" style="background-color: #575757"
+    >Requirements</a
+    >
+    <a href="/lecturers/offers">Send Offer</a>
+
+    <a href="/lecturers/viewOfferApp">Offer&Application</a>
+    <a href="/lecturers/positions">View positions</a>
+
+    <a href="/lecturers/timetable">Timetable</a>
+
+    <div class="user-info" th:text="${lecturer.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Lecturer Page</h1>
+    <hr/>
+    <h3>Courses</h3>
+    <table class="courses">
+        <thead>
+        <tr>
+            <th style="width: 15%">Class code</th>
+            <th style="width: 15%">Quantity</th>
+            <th style="width: 15%">WorkHours</th>
+            <th style="width: 10%">ClassGrade</th>
+            <th style="width: 10%">Stage limit</th>
+            <th style="width: 10%">Undergrad</th>
+            <th style="width: 10%">Master</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="requirement : ${requirementsList}">
+            <td th:text="${requirement.code}"></td>
+            <td th:text="${requirement.quantity}"></td>
+            <td th:text="${requirement.workHours}"></td>
+            <td th:text="${requirement.classGrade}"></td>
+            <td th:text="${requirement.stageRequirement}"></td>
+            <td th:text="${requirement.undergrad}"></td>
+            <td th:text="${requirement.master}"></td>
+            <td>
+                <button class="test1" th:attr="data-rid=${requirement.rid}">manage</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr/>
+</div>
+
+<div id="formModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form>
+            <label for="numberneed">Numbers:</label>
+            <input type="text" name="numberneed" id="numberneed" required/>
+            <label for="gradeStatus">Choose a grade:</label>
+            <select id="gradeStatus" name="gradeStatus" required>
+                <option value="A_plus">A+</option>
+                <option value="A">A</option>
+                <option value="A_minus">A-</option>
+                <option value="B_plus">B+</option>
+                <option value="B">B</option>
+                <option value="B_minus">B-</option>
+            </select>
+            <label for="times">Times: (max is 16)</label>
+            <input type="number" name="times" id="times" max="16" min="1" required/>
+            <label for="stageLimit">Choose the limitation of stage:</label>
+            <select id="stageLimit" name="stageLimit" required>
+                <option value="1">grade 1</option>
+                <option value="2">grade 2</option>
+                <option value="3">grade 3</option>
+                <option value="4">grade 4</option>
+                <option value="5">graduate student</option>
+                <option value="6">doctoral student</option>
+            </select>
+
+            <input type="submit" value="Submit"/>
+        </form>
+    </div>
+</div>
+
+<script>
+    var modal = document.getElementById("formModal");
+    var span = document.getElementsByClassName("close")[0];
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    $(document).ready(function () {
+        let rid = 0;
+        $(".test1").click(function () {
+            modal.style.display = "block";
+            rid = $(this).attr("data-rid");
+        });
+
+
+        $("#formModal form").submit(function (event) {
+            event.preventDefault();
+            const numberneed = $("#numberneed").val();
+            const gradeStatus = $("#gradeStatus").val();
+            const times = $("#times").val();
+            let stageLimit = parseInt($("#stageLimit").val(), 10);
+            let undergrad = false;
+            let master = false;
+            if (stageLimit === 5){
+                undergrad = true;
+                stageLimit = 0;
+            }
+            if (stageLimit === 6){
+                master = true;
+                stageLimit = 0;
+            }
+            const data = {
+                rid: rid,
+                numberneed: numberneed,
+                gradeStatus: gradeStatus,
+                times: times,
+                stageLimit: stageLimit,
+                undergrad: undergrad,
+                master: master,
+            };
+            $.ajax({
+                type: "PUT",
+                url: "/lecturers/requirements/management",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if (response.code === 1){
+                        alert("requirement update successfully");
+                        window.location.reload();
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function (response) {
+                    alert("error");
+                },
+            });
+        });
+    });
+</script>
+</body>
+</html>

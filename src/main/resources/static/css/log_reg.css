@@ -1,0 +1,83 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ecef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    margin: auto;
+  }
+  
+  input[type=text], input[type=password] {
+    width: calc(100% - 30px);
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f1f1f1;
+  }
+  
+  input[type=text]:focus, input[type=password]:focus {
+    background-color: #ddd;
+    border-color: #80bdff;
+    outline: none;
+  }
+  
+  hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+  }
+  
+  .loginbtn, .registerbtn {
+    background-color: #007bff;
+    color: white;
+    padding: 16px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+  }
+  
+  .loginbtn:hover, .registerbtn:hover {
+    background-color: #0069d9;
+  }
+  
+  a {
+    color: #007bff;
+  }
+  
+  .signup, .signin {
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 20px;
+    border-radius: 0 0 10px 10px;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  p {
+    text-align: center;
+  }
+  
+  /* 响应式设计：当屏幕宽度小于 600px 时调整布局 */
+  @media (max-width: 600px) {
+    .container {
+      width: 90%;
+      padding: 20px;
+    }
+  }

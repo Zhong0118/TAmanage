@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>student view all applications and offers</title>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/students/index_student" >Index</a>
+    <a href="/students/courses">Courses</a>
+    <a href="/students/application">Apply for TA</a>
+    <a href="/students/viewAPPOffer" style="background-color: #575757">Application&Offer</a>
+    <a href="/students/positions" >Pers.Positions</a>
+
+    <a href="/students/timetable">Timetable</a>
+
+    <div class="user-info" th:text="${student.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Student Page</h1>
+    <hr/>
+    <h3>view all offers and applications </h3>
+    <div class="tab" style="margin: 2px">
+        <button class="tablinks" onclick="showTable(1, this)">
+            offers
+        </button>
+        <button class="tablinks" onclick="showTable(2, this)">applications</button>
+    </div>
+
+    <table class="order order1">
+        <thead>
+        <tr>
+            <th style="width: 15%">Class code</th>
+            <th style="width: 60%">Description</th>
+            <th style="width: 25%">Operation</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="offer : ${offersList}">
+            <td th:text="${offer.code}"></td>
+            <td th:text="${offer.description}"></td>
+            <td>
+                <div>
+                    <button class="accept" th:attr="data-oid=${offer.oid}, data-uid=${student.uid}">
+                    </button>
+                    <button class="reject" th:attr="data-oid=${offer.oid}, data-uid=${student.uid}">
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="order order2">
+        <thead>
+        <tr>
+            <th style="width: 50%">Class code</th>
+            <th style="width: 50%">Status</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="a : ${applicationsList}">
+            <td th:text="${a.code}"></td>
+            <td>
+                <button disabled th:classappend="${a.status.name() == 'Rejected' ? 'reject disabled' : (a.status.name() == 'Accepted' ? 'accept disabled' : 'waiting')}"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function showTable(stageNumber, element) {
+            // Hide all tables
+            var tables = document.querySelectorAll(".order");
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].style.display = "none";
+            }
+
+            // Remove the 'stage' class from all buttons
+            var stageButtons = document.querySelectorAll(".tablinks");
+            for (var i = 0; i < stageButtons.length; i++) {
+                stageButtons[i].classList.remove("stage");
+            }
+
+            // Add the 'stage' class to the clicked button
+            element.classList.add("stage");
+
+            // Show the selected table
+            var selectedTable = document.querySelector(".order" + stageNumber);
+            if (selectedTable) {
+                selectedTable.style.display = "table";
+            }
+        }
+
+        // Show stage1 table by default when the page loads
+        window.onload = function () {
+            // Trigger the click on the first tab
+            document.querySelector(".tablinks").click();
+        };
+
+
+        $(document).ready(function () {
+            // Event listener for the accept button
+            $('.disabled').click(function () {
+                alert('You have already accepted/rejected this offer');
+            });
+
+            $('.accept').click(function () {
+                const oid = $(this).data('oid');
+                const uid = $(this).data('uid');
+                updateOfferStatus(uid, oid, 'Accepted');
+            });
+
+            // Event listener for the reject button
+            $('.reject').click(function () {
+                const oid = $(this).data('oid');
+                const uid = $(this).data('uid');
+                updateOfferStatus(uid, oid, 'Rejected');
+            });
+
+
+        });
+
+        function updateOfferStatus(uid, oid, status) {
+            $.ajax({
+                url: '/students/offers/' + uid + '/' + oid + '?status=' + status,  // 将 status 添加到 URL 中
+                type: 'PUT',
+                success: function (response) {
+                    // 处理成功的响应
+                    if (response.code === 1) {
+                        alert('Offer status updated successfully');
+                        location.reload(); // 刷新页面
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // 处理错误的响应
+                    alert('Failed to update offer status');
+                }
+            });
+        }
+
+
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>student apply for TA</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/students/index_student">Index</a>
+    <a href="/students/courses">Courses</a>
+    <a href="/students/application" style="background-color: #575757">Apply for TA</a>
+    <a href="/students/viewAPPOffer">Application&Offer</a>
+    <a href="/students/positions">Pers.Positions</a>
+
+    <a href="/students/timetable">Timetable</a>
+
+    <div class="user-info" th:text="${student.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Student Page</h1>
+    <hr/>
+    <h3>Choose course to send application</h3>
+    <select id="tableSelector" onchange="showTable(this.value)">
+        <th:block th:each="stage : ${#numbers.sequence(1, student.stage)}">
+            <optgroup th:attr="label='stage' + ${stage}">
+                <th:block th:each="course : ${courses}">
+                    <option th:if="${course.stage} == ${stage}" th:text="${course.courseCode}" th:value="${course.cid}"
+                            th:data-type="course"></option>
+                </th:block>
+                <th:block th:each="module : ${modules}">
+                    <option th:if="${module.stage} == ${stage}" th:text="${module.moduleCode}" th:value="${module.mid}"
+                            th:data-type="module"></option>
+                </th:block>
+            </optgroup>
+        </th:block>
+    </select>
+
+    <form id="offerForm">
+        <label for="courseInput">Course:</label>
+        <input type="text" id="courseInput" name="course" readonly/>
+        <div class="form-row">
+            <label for="studentID">BDIC id:</label>
+            <select id="studentID" name="studentID" disabled>
+                <option th:text="${student.studentId}" th:value="${student.uid}"></option>
+            </select>
+            <label for="studentName">name:</label>
+            <select id="studentName" name="studentName" disabled>
+                <option th:text="${student.username}" th:value="${student.username}"></option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="studentStage">stage:</label>
+            <select id="studentStage" name="studentStage" disabled>
+                <option th:text="'stage' + ${student.stage}" th:value="${student.stage}"></option>
+            </select>
+            <label for="studentMajor">major:</label>
+            <select id="studentMajor" name="studentMajor" disabled>
+                <option th:text="${student.majorCode}" th:value="${student.majorCode}"></option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="studentGrade">grade:</label>
+            <select id="studentGrade" name="studentGrade" required>
+                <option value="A_plus">A+</option>
+                <option value="A">A</option>
+                <option value="A_minus">A-</option>
+                <option value="B_plus">B+</option>
+                <option value="B">B</option>
+                <option value="B_minus">B-</option>
+            </select>
+            <label for="studentProject">project:</label>
+            <select id="studentProject" name="studentProject" required>
+                <option value="NONE">null</option>
+                <option value="A_plus">A+</option>
+                <option value="A">A</option>
+                <option value="A_minus">A-</option>
+                <option value="B_plus">B+</option>
+                <option value="B">B</option>
+                <option value="B_minus">B-</option>
+            </select>
+        </div>
+        <label for="description">description:</label>
+        <textarea name="multiLineInput" id="description"></textarea>
+        <button type="submit">Send Offer</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var courseInput = document.getElementById("courseInput");
+        var tableSelector = document.getElementById("tableSelector");
+
+        // Check if a course was saved in sessionStorage and set it as selected
+        var savedCourse = sessionStorage.getItem("selectedCourse");
+        if (savedCourse) {
+            tableSelector.value = savedCourse;
+            courseInput.value =
+                tableSelector.options[tableSelector.selectedIndex].text;
+        } else {
+            // If not, initialize with the first course
+            courseInput.value =
+                tableSelector.options[tableSelector.selectedIndex].text;
+        }
+
+        // Event listener for the select element
+        tableSelector.addEventListener("change", function () {
+            courseInput.value = this.options[this.selectedIndex].text;
+            // Save the selected course to sessionStorage
+            sessionStorage.setItem("selectedCourse", this.value);
+        });
+
+        // Form submission event listener
+        document
+            .getElementById("offerForm")
+            .addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent the default form submission
+                var studentId = document.getElementById("studentIdInput").value;
+                // Logic to handle the form submission goes here
+                // After handling submission, possibly redirect or reload the page
+                console.log("Course:", courseInput.value, "Student ID:", studentId);
+                // Remember to clear the selected course if needed or it will persist for the session
+                // sessionStorage.removeItem("selectedCourse");
+            });
+
+
+        $(document).ready(function () {
+            $("#offerForm").submit(function (event) {
+                event.preventDefault();
+
+                // 使用 jQuery 获取表单字段的值
+                const classId = $("#tableSelector option:selected").val();
+                const type = $("#tableSelector option:selected").attr("data-type");
+                const studentId = $("#studentID").val();
+                const studentGrade = $("#studentGrade").val();
+                const studentProject = $("#studentProject").val();
+                const description = $("#description").val();
+                const majorCode = $("#studentMajor").val();
+                const stage = $("#studentStage").val();
+                // 创建一个包含申请信息的对象
+                const application = {
+                    classId: classId,
+                    type: type,
+                    studentId: studentId,
+                    studentGrade: studentGrade,
+                    studentProject: studentProject,
+                    majorCode: majorCode,
+                    stage: stage,
+                    description: description
+                };
+
+                sendApplication(application);
+            });
+        });
+
+        function sendApplication(application) {
+            $.ajax({
+                url: '/students/sendApplication',  // 更改为你的 API 端点
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(application),
+                success: function (response) {
+                    // 处理成功的响应
+                    if (response.code === 1) {
+                        alert('Application sent successfully');
+                        location.reload(); // 刷新页面
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // 处理错误的响应
+                    alert('Failed to send application');
+                }
+            });
+        }
+
+
+    });
+</script>
+</body>
+</html>

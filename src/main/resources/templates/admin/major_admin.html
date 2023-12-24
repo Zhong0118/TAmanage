@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+    <title>concrete major</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin">Index</a>
+    <a href="/admins/majors" style="background-color: #575757">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts">Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3 th:text="${major.majorCode}"></h3>
+    <div class="tab">
+        <button class="tablinks" onclick="showTable(1, this)">Stage 1</button>
+        <button class="tablinks" onclick="showTable(2, this)">Stage 2</button>
+        <button class="tablinks" onclick="showTable(3, this)">Stage 3</button>
+        <button class="tablinks" onclick="showTable(4, this)">Stage 4</button>
+        <button id="addCourse">Add one new course</button>
+    </div>
+
+    <div id="formModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="close">&times;</div>
+            <form>
+                <input type="hidden" name="operationType" id="operationType" value="post"/>
+                <input type="hidden" name="chooseMajor" id="majorId" th:value="${major.mid}"/>
+                <label for="chooseStage">Choose a stage:</label>
+                <select id="chooseStage" name="chooseStage" required>
+                    <option value="1">stage1</option>
+                    <option value="2">stage2</option>
+                    <option value="3">stage3</option>
+                    <option value="4">stage4</option>
+                </select>
+                <label for="addCourseCode">Add a course code:</label>
+                <input type="text" name="addCourseCode" id="addCourseCode" required/>
+                <label for="addCourseTitle">Add a course title:</label>
+                <input type="text" name="addCourseCode" id="addCourseTitle" required/>
+                <label for="addCourseTrimester">Choose a trimester:</label>
+                <select id="addCourseTrimester" name="addCourseTrimester" required>
+                    <option value="Autumn">Autumn</option>
+                    <option value="Spring">Spring</option>
+                </select>
+                <label for="addCourseLecturer">Add a lecturer:</label>
+                <input
+                        type="text"
+                        name="addCourseLecturer"
+                        id="addCourseLecturer"
+                        required
+                />
+                <div class="form-row">
+                    <label for="chooseLecture">lecture:</label>
+                    <select id="chooseLecture" name="chooseLecture" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                    <label for="chooseLectureTime">lecture time:</label>
+                    <select id="chooseLectureTime" name="chooseLectureTime" required>
+                        <optgroup label="morning">
+                            <option value="Morning1">08:00-09:35</option>
+                            <option value="Morning2">09:55-11:30</option>
+                        </optgroup>
+                        <optgroup label="afternoon">
+                            <option value="Afternoon1">13:30-15:05</option>
+                            <option value="Afternoon2">15:25-17:00</option>
+                        </optgroup>
+                        <optgroup label="evening">
+                            <option value="Evening1">18:00-19:35</option>
+                            <option value="Evening2">19:55-21:30</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="chooseLab">lab:</label>
+                    <select id="chooseLab" name="chooseLab" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                    <label for="chooseLabTime">lab time:</label>
+                    <select id="chooseLabTime" name="chooseLabTime" required>
+                        <optgroup label="morning">
+                            <option value="Morning1">08:00-09:35</option>
+                            <option value="Morning2">09:55-11:30</option>
+                        </optgroup>
+                        <optgroup label="afternoon">
+                            <option value="Afternoon1">13:30-15:05</option>
+                            <option value="Afternoon2">15:25-17:00</option>
+                        </optgroup>
+                        <optgroup label="evening">
+                            <option value="Evening1">18:00-19:35</option>
+                            <option value="Evening2">19:55-21:30</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <input type="submit" value="Submit" id="add"/>
+            </form>
+        </div>
+    </div>
+
+    <table class="se stage1">
+        <thead>
+        <tr>
+            <th style="width: 15%">Course code</th>
+            <th style="width: 20%">Title</th>
+            <th style="width: 10%">Trimester</th>
+            <th style="width: 10%">Type</th>
+            <th style="width: 10%">Day</th>
+            <th style="width: 10%">Timeslot</th>
+            <th style="width: 10%">Lecturer</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course:${stage1}">
+            <td th:text="${course.courseCode}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.trimester}"></td>
+            <td th:text="${course.type}"></td>
+            <td th:text="${course.day}"></td>
+            <td th:switch="${course.timeslot.name()}">
+                <span th:case="'Morning1'">08:00-09:35</span>
+                <span th:case="'Morning2'">09:55-11:30</span>
+                <span th:case="'Afternoon1'">13:30-15:05</span>
+                <span th:case="'Afternoon2'">15:25-17:00</span>
+                <span th:case="'Evening1'">18:00-19:35</span>
+                <span th:case="'Evening2'">19:55-21:30</span>
+            </td>
+            <td th:text="${course.lecturer.username}"></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-course-btn"
+                            th:attr="data-code=${course.courseCode}, data-type=${course.type}, data-stage=${course.stage}">
+                        edit
+                    </button>
+                    <button class="delete-course-btn" th:attr="data-code=${course.courseCode}">del</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="se stage2">
+        <thead>
+        <tr>
+            <th style="width: 15%">Course code</th>
+            <th style="width: 20%">Title</th>
+            <th style="width: 10%">Trimester</th>
+            <th style="width: 10%">Type</th>
+            <th style="width: 10%">Day</th>
+            <th style="width: 10%">Timeslot</th>
+            <th style="width: 10%">Lecturer</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course:${stage2}">
+            <td th:text="${course.courseCode}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.trimester}"></td>
+            <td th:text="${course.type}"></td>
+            <td th:text="${course.day}"></td>
+            <td th:switch="${course.timeslot.name()}">
+                <span th:case="'Morning1'">08:00-09:35</span>
+                <span th:case="'Morning2'">09:55-11:30</span>
+                <span th:case="'Afternoon1'">13:30-15:05</span>
+                <span th:case="'Afternoon2'">15:25-17:00</span>
+                <span th:case="'Evening1'">18:00-19:35</span>
+                <span th:case="'Evening2'">19:55-21:30</span>
+            </td>
+            <td th:text="${course.lecturer.username}"></td>
+
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-course-btn"
+                            th:attr="data-code=${course.courseCode}, data-type=${course.type}, data-stage=${course.stage}">
+                        edit
+                    </button>
+
+                    <button class="delete-course-btn" th:attr="data-code=${course.courseCode}">del</button>
+
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="se stage3">
+        <thead>
+        <tr>
+            <th style="width: 15%">Course code</th>
+            <th style="width: 20%">Title</th>
+            <th style="width: 10%">Trimester</th>
+            <th style="width: 10%">Type</th>
+            <th style="width: 10%">Day</th>
+            <th style="width: 10%">Timeslot</th>
+            <th style="width: 10%">Lecturer</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course:${stage3}">
+            <td th:text="${course.courseCode}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.trimester}"></td>
+            <td th:text="${course.type}"></td>
+            <td th:text="${course.day}"></td>
+            <td th:switch="${course.timeslot.name()}">
+                <div th:case="'Morning1'">08:00-09:35</div>
+                <div th:case="'Morning2'">09:55-11:30</div>
+                <div th:case="'Afternoon1'">13:30-15:05</div>
+                <div th:case="'Afternoon2'">15:25-17:00</div>
+                <div th:case="'Evening1'">18:00-19:35</div>
+                <div th:case="'Evening2'">19:55-21:30</div>
+            </td>
+            <td th:text="${course.lecturer.username}"></td>
+
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-course-btn"
+                            th:attr="data-code=${course.courseCode}, data-type=${course.type}, data-stage=${course.stage}">
+                        edit
+                    </button>
+
+                    <button class="delete-course-btn" th:attr="data-code=${course.courseCode}">del</button>
+
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="se stage4">
+        <thead>
+        <tr>
+            <th style="width: 15%">Course code</th>
+            <th style="width: 20%">Title</th>
+            <th style="width: 10%">Trimester</th>
+            <th style="width: 10%">Type</th>
+            <th style="width: 10%">Day</th>
+            <th style="width: 10%">Timeslot</th>
+            <th style="width: 10%">Lecturer</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course:${stage4}">
+            <td th:text="${course.courseCode}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.trimester}"></td>
+            <td th:text="${course.type}"></td>
+            <td th:text="${course.day}"></td>
+            <td th:switch="${course.timeslot.name()}">
+                <div th:case="'Morning1'">08:00-09:35</div>
+                <div th:case="'Morning2'">09:55-11:30</div>
+                <div th:case="'Afternoon1'">13:30-15:05</div>
+                <div th:case="'Afternoon2'">15:25-17:00</div>
+                <div th:case="'Evening1'">18:00-19:35</div>
+                <div th:case="'Evening2'">19:55-21:30</div>
+            </td>
+            <td th:text="${course.lecturer.username}"></td>
+
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-course-btn"
+                            th:attr="data-code=${course.courseCode}, data-type=${course.type}, data-stage=${course.stage}">
+                        edit
+                    </button>
+
+                    <button class="delete-course-btn" th:attr="data-code=${course.courseCode}">del</button>
+
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function showTable(stageNumber, element) {
+        sessionStorage.setItem("selectedStage", stageNumber); // Save the selected stage
+
+        // Hide all tables
+        var tables = document.querySelectorAll(".se");
+        tables.forEach(function (table) {
+            table.style.display = "none";
+        });
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        stageButtons.forEach(function (button) {
+            button.classList.remove("stage");
+        });
+
+        // Add the 'stage' class to the clicked button
+        element.classList.add("stage");
+
+        // Show the selected table
+        var selectedTable = document.querySelector(".se.stage" + stageNumber);
+        if (selectedTable) {
+            selectedTable.style.display = "table";
+        }
+    }
+
+
+    document
+        .getElementById("chooseStage")
+        .addEventListener("change", function () {
+            // Get the stage number from the select option value
+            var stageNumber = this.value.replace("stage", "");
+            sessionStorage.setItem("selectedStage", stageNumber); // Update the selected stage
+
+            // Find and click the corresponding stage button
+            var stageButton = document.querySelector(
+                ".tablinks.stage" + stageNumber
+            );
+            if (stageButton) {
+                showTable(stageNumber, stageButton); // Call showTable to update the view
+            }
+        });
+
+    window.onload = function () {
+        var selectedStage = sessionStorage.getItem("selectedStage") || 1; // 从 sessionStorage 中获取选中的 stage，如果不存在则默认为 1
+
+        // 设置选择框的值
+        document.getElementById("chooseStage").value = "stage" + selectedStage;
+
+        // 触发对应的标签点击事件以更新界面
+        var tabToClick = document.querySelector(".tablinks.stage" + selectedStage) || document.querySelector(".tablinks");
+        if (tabToClick) {
+            showTable(selectedStage, tabToClick); // 调用 showTable 来确保一致的行为
+        }
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        stageButtons.forEach(function (button) {
+            button.classList.remove("stage");
+        });
+
+        // Add the 'stage' class to the selected button
+        var selectedButton = document.querySelector(".tablinks.stage" + selectedStage);
+        if (selectedButton) {
+            selectedButton.classList.add("stage");
+        }
+    };
+
+
+    var modal = document.getElementById("formModal");
+
+    var btn = document.getElementById("addCourse");
+
+    var div = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function () {
+        var selectedStage = sessionStorage.getItem("selectedStage") || 1;
+        document.getElementById("chooseStage").value = "stage" + selectedStage;
+        modal.style.display = "block";
+        $('#operationType').val('post');
+        $('#addCourseCode').prop('disabled', false).val('');
+        $('#chooseStage').prop('disabled', false);
+        $('#addCourseTitle').val('');
+        $('#addCourseTrimester').val('Autumn');
+        $('#addCourseLecturer').val('');
+        $('#chooseLecture').val('Monday');
+        $('#chooseLectureTime').val('Morning1');
+        $('#chooseLab').val('Monday');
+        $('#chooseLabTime').val('Morning1');
+
+    };
+
+    div.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+
+    const mid = $('#majorId').val();
+
+    $('.edit-course-btn').click(function () {
+        // 获取当前行
+        var row = $(this).closest('tr');
+        const stage = $(this).data('stage');
+        console.log(stage)
+
+        // 从当前行获取需要的值
+        var courseCode = row.find('td:eq(0)').text();
+        var courseName = row.find('td:eq(1)').text();
+        var trimester = row.find('td:eq(2)').text();
+        var type = row.find('td:eq(3)').text();
+        var day = row.find('td:eq(4)').text();
+        var timeslot = row.find('td:eq(5)').text();
+        var lecturerId = row.find('td:eq(6)').text();
+
+        // 将获取的值填入到表单中
+        $('#chooseStage').val(stage).prop('disabled', true);
+        $('#addCourseCode').val(courseCode).prop('disabled', true);
+        $('#addCourseTitle').val(courseName);
+        $('#addCourseTrimester').val(trimester);
+        $('#addCourseLecturer').val(lecturerId);
+        if (type === 'Lecture') {
+            $('#chooseLecture').val(day);
+            $('#chooseLectureTime').val(timeslot);
+        } else if (type === 'Lab') {
+            $('#chooseLab').val(day);
+            $('#chooseLabTime').val(timeslot);
+        }
+
+        $('#operationType').val('put');
+        // 显示模态框
+        $('#formModal').show();
+    });
+
+
+    $('#formModal form').submit(function (event) {
+        const operationType = $('#operationType').val();
+
+        const courseCode = $('#addCourseCode').val();
+        const stage = $('#chooseStage').val();
+        const courseName = $('#addCourseTitle').val();
+        const trimester = $('#addCourseTrimester').val();
+        const lecturer = $('#addCourseLecturer').val();
+        const day1 = $('#chooseLecture').val();
+        const timeslot1 = $('#chooseLectureTime').val();
+        const day2 = $('#chooseLab').val();
+        const timeslot2 = $('#chooseLabTime').val();
+
+        if (day1 === day2 && timeslot1 === timeslot2) {
+            alert('The lecture and lab cannot be arranged at the same time');
+            event.preventDefault();
+        } else {
+            event.preventDefault();
+
+            const lectureData = {
+                stage: stage,
+                courseCode: courseCode,
+                courseName: courseName,
+                trimester: trimester,
+                lecturerId: lecturer,
+                type: 'Lecture',
+                day: day1,
+                timeslot: timeslot1,
+            };
+
+            const labData = {
+                stage: stage,
+                courseCode: courseCode,
+                courseName: courseName,
+                trimester: trimester,
+                lecturerId: lecturer,
+                type: 'Lab',
+                day: day2,
+                timeslot: timeslot2
+            };
+
+            if (operationType === 'post') {
+                $.ajax({
+                    url: '/admins/majors/' + mid + '/addCourse',  // 确保 mid 是正确的专业ID
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({lecture: lectureData, lab: labData}),
+                    success: function (response) {
+                        if (response.code === 1) {
+                            alert('add course successfully');
+                            sessionStorage.setItem("selectedStage", stage); // Set selectedStage as stage
+                            location.reload(); // Refresh the page
+                        } else {
+                            alert(response.msg);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert('add course error');
+                    }
+                });
+            } else {
+                // 发送PUT请求
+                $.ajax({
+                    url: '/admins/majors/' + mid + '/' + courseCode,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({lecture: lectureData, lab: labData}),
+                    success: function (response) {
+                        if (response.code === 1) {
+                            alert('update course successfully');
+                            sessionStorage.setItem("selectedStage", stage); // Set selectedStage as stage
+                            location.reload(); // Refresh the page
+                        } else {
+                            alert(response.msg);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert('update course error');
+                    }
+                });
+            }
+        }
+
+    });
+
+    $('.delete-course-btn').click(function () {
+        const courseCode = $(this).data('code');
+        console.log(courseCode);
+        if (courseCode) {
+            if (confirm('确定要删除这门课程吗？')) {
+                $.ajax({
+                    url: '/admins/majors/' + mid + '/' + courseCode,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.code === 1) {
+                            alert('delete course successfully');
+                            location.reload();
+                        } else {
+                            alert(response.msg);
+                        }
+                    },
+                    error: function () {
+                        alert('delete course error');
+                    }
+                });
+            }
+        } else {
+            alert('course code is null');
+        }
+    });
+
+
+</script>
+</body>
+</html>

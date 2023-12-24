@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>admin index</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin" style="background-color: #575757">Index</a>
+    <a href="/admins/majors">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts" >Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1> Admin Page</h1>
+    <hr>
+    <h3>Self-info</h3>
+    <table class="self-info">
+        <thead>
+        <tr>
+            <th style="width: 50%;">Information</th>
+            <th>Data</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Academic Year</td>
+            <td>2023/2024</td>
+        </tr>
+        <tr>
+            <td>Trimester</td>
+            <td>Autumn</td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <h3>Majors</h3>
+    <table class="majors">
+        <thead>
+        <tr>
+            <th style="width: 50%;">Major-name</th>
+            <th>Classes number</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="major, iterStat : ${majors}">
+            <td th:text="${major.majorName}"></td>
+            <td th:text="${classesCountForEachMajor[iterStat.index]}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <h3>Accounts</h3>
+    <table class="accounts">
+        <thead>
+        <tr>
+            <th style="width: 50%;">Type</th>
+            <th>Numbers</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Admin</td>
+            <td th:text="${adminCount}"></td>
+        </tr>
+        <tr>
+            <td>Lecturer</td>
+            <td th:text="${lecturerCount}"></td>
+        </tr>
+        <tr>
+            <td>Student</td>
+            <td th:text="${studentCount}">1000</td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <h3>Positions</h3>
+    <table class="positions">
+        <thead>
+        <tr>
+            <th style="width: 50%;">Type</th>
+            <th>Numbers</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>TA Requests</td>
+            <td th:text="${requirementCount}"></td>
+        </tr>
+        <tr>
+            <td>TA Applications</td>
+            <td th:text="${applicationCount}"></td>
+        </tr>
+        <tr>
+            <td>Offers</td>
+            <td th:text="${offerCount}"></td>
+        </tr>
+        <tr>
+            <td>Positions</td>
+            <td th:text="${positionCount}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+
+</div>
+</body>
+</html>

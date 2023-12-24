@@ -1,0 +1,236 @@
+/* General Table Styles */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 20px 0;
+	font-size: 0.7em;
+	font-family: "Lato", sans-serif;
+	min-width: 400px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+th,
+td {
+	padding: 12px 15px;
+	border-bottom: 1px solid #dddddd;
+	width: auto; /* Set width to auto for even distribution */
+	text-align: left; /* Align the text to the left for all cells */
+}
+/* Bold first column */
+td:first-child {
+	font-weight: bold; /* Make first column bold */
+}
+
+/* Table Headers Styles */
+thead th {
+	background-color: #003366; /* Deep blue background for headers */
+	color: #ffffff;
+	width: auto; /* Set width to auto for even distribution */
+	text-align: left; /* Align the text to the left for all cells */
+	top: 0;
+	z-index: 2;
+}
+
+/* Table Body Styles */
+tbody tr {
+	border-bottom: 1px solid #dddddd;
+	width: auto; /* Set width to auto for even distribution */
+	text-align: left; /* Align the text to the left for all cells */
+}
+
+tbody tr:nth-of-type(even) {
+	background-color: #f3f3f3;
+}
+
+tbody tr:last-of-type {
+	border-bottom: 2px solid #003366; /* Deep blue highlight for the last row */
+}
+
+tbody tr.active-row {
+	font-weight: bold;
+	color: #003366; /* Deep blue color for the active row */
+}
+
+/* Button Styles within Table */
+.action-buttons {
+	text-align: center; /* Center the buttons within the Actions column */
+}
+
+button {
+	padding: 8px 15px; /* Increased padding for a larger click area */
+	margin: 0 5px; /* Add margin between buttons */
+	border: none;
+	border-radius: 4px; /* Rounded corners for a modern look */
+	background-color: #0055a4; /* Deep blue background for buttons */
+	color: #ffffff; /* White text for better contrast */
+	text-transform: uppercase;
+	font-size: 0.8em; /* Increased font size for readability */
+	cursor: pointer;
+	outline: none; /* Remove focus outline for a cleaner look */
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+	transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+}
+
+button:hover,
+button:focus {
+	background-color: #003366; /* Darker shade of blue for hover and focus */
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Larger shadow for hover and focus */
+}
+
+
+/* Responsive Table */
+@media screen and (max-width: 600px) {
+	.action-buttons button {
+		display: inline-block;
+		margin-bottom: 5px; /* Add space below the button */
+	}
+}
+
+.purpose {
+	font-weight: bold;
+}
+.accept, .accept1 {
+    background-color: rgb(2, 86, 2) ; /* Lighter green for normal state */
+    /* Other styles... */
+}
+
+.accept:hover, .accept1:hover,
+.accept:active, .accept1:active,
+.accept:focus, .accept1:focus {
+    background-color: rgb(1, 38, 1); /* Dark green for hover and active states */
+    /* Other styles... */
+}
+
+.reject {
+    background-color: rgb(119, 7, 7) ; /* Lighter red for normal state */
+    /* Other styles... */
+}
+
+.reject:hover,
+.reject:active,
+.reject:focus {
+    background-color: rgb(65, 3, 3); /* Dark red for hover and active states */
+    /* Other styles... */
+}
+.waiting,
+.waiting:hover,
+.waiting:focus,
+.waiting:active {
+	background-color: #003366 !important;
+    cursor: not-allowed !important; /* The cursor indicates the button is not clickable */
+    box-shadow: none !important; /* No shadow to keep the button flat */
+}
+.waiting::before {
+	content: 'waiting';
+}
+.accept::before, .accept1::before {
+	content: 'accept';
+}
+.reject::before {
+	content: 'reject';
+}
+.accept.disabled,
+.accept.disabled:hover,
+.accept.disabled:focus,
+.accept.disabled:active,
+.accept1.disabled,
+.accept1.disabled:hover,
+.accept1.disabled:focus,
+.accept1.disabled:active{
+	background-color: rgb(2, 86, 2) !important;
+    cursor: not-allowed !important; /* The cursor indicates the button is not clickable */
+    box-shadow: none !important; /* No shadow to keep the button flat */
+}
+.reject.disabled,
+.reject.disabled:hover,
+.reject.disabled:focus,
+.reject.disabled:active {
+	background-color: rgb(119, 7, 7) !important;
+    cursor: not-allowed !important; /* The cursor indicates the button is not clickable */
+    box-shadow: none !important; /* No shadow to keep the button flat */
+}
+
+.pending {
+	color: #646464;
+	background-color: rgba(221, 221, 221, 0.845);
+}
+.timetable td:first-child,
+.timetable th:first-child {
+	width: 12%;
+	border-right: 1px solid #cac0c0;
+}
+.timetable th {
+	text-align: center;
+	border-right: 1px solid #cac0c0;
+}
+.timetable td,
+.timetable th {
+	border-right: 1px solid #cac0c0;
+	width: 17.6%;
+}
+.timetable tr {
+	height: 68px;
+}
+.lecturers {
+	text-align: center;
+	color: #003366;
+	border: 1px solid #003366;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-radius: 10px;
+	font-weight: bold;
+}
+.labs {
+	text-align: center;
+	color: #646464;
+	border: 1px solid #646464;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
+/* Style the dropdown selector */
+#tableSelector {
+	padding: 8px 16px;
+	border: 1px solid #ddd; /* Subtle border color */
+	border-radius: 4px; /* Rounded corners */
+	background-color: white;
+	background-repeat: no-repeat;
+	background-position: right 10px center; /* Arrow position */
+	background-size: 12px; /* Arrow size */
+	font-size: 16px; /* Increase font size for better readability */
+	margin-bottom: 20px; /* Space below the dropdown */
+	cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+	transition: border-color 0.3s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions for interactive states */
+	-webkit-appearance: none; /* Remove default styling on iOS */
+	-moz-appearance: none; /* Remove default styling on Firefox */
+	appearance: none; /* Remove default arrow for custom style */
+}
+
+/* Add a focus style for accessibility */
+#tableSelector:focus {
+	border-color: #333; /* Darker border for focus */
+	box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.2); /* Subtle shadow for depth */
+	outline: none; /* Remove default focus outline */
+}
+
+/* Style the dropdown options */
+#tableSelector option {
+	padding: 10px; /* Add some padding to dropdown options for better readability */
+	background-color: white; /* Background for options */
+}
+
+/* Add a hover effect for dropdown options */
+#tableSelector option:hover,
+#tableSelector option:focus {
+	background-color: #f2f2f2; /* Light grey background on hover/focus */
+}
+
+/* Responsive dropdown width */
+@media (max-width: 600px) {
+	#tableSelector {
+		width: 100%; /* Full width on small screens */
+		padding-right: 30px; /* Adjust padding to not overlap with the background arrow image */
+	}
+}

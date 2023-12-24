@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+    <title>admin view offers</title>
+
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin">Index</a>
+    <a href="/admins/majors">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts">Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers" style="background-color: #575757">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>Offers</h3>
+    <table class="offers">
+        <thead>
+        <tr>
+            <th style="width: 35%">Course code</th>
+            <th style="width: 35%">BDIC ID</th>
+            <th style="width: 30%">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="offer : ${offersList}">
+            <td th:text="${offer.code}"></td>
+            <td th:text="${offer.sid}"></td>
+            <td>
+                <button th:classappend="${offer.status.name() == 'Pending' ? 'waiting' : (offer.status.name() == 'Accepted' ? 'accept disabled' : 'reject disabled')}"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr/>
+</div>
+
+</body>
+</html>

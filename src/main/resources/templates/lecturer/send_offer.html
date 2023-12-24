@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>lecturer sending offers page</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/lecturers/index_lecturer">Index</a>
+    <a href="/lecturers/requirements">Requirements</a>
+    <a href="/lecturers/offers" style="background-color: #575757"
+    >Send Offer</a
+    >
+    <a href="/lecturers/viewOfferApp">Offer&Application</a>
+    <a href="/lecturers/positions">View positions</a>
+
+    <a href="/lecturers/timetable">Timetable</a>
+
+
+    <div class="user-info" th:text="${lecturer.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Lecturer Page</h1>
+    <hr/>
+    <h3>Choose student to send offer</h3>
+    <select id="tableSelector" onchange="showTable(this.value)">
+        <option th:each="requirement : ${requirementsList}"
+                th:value="${requirement.cid != 0 ? 'c-' + requirement.cid : 'm-' + requirement.mid}"
+                th:text="${requirement.code}"></option>
+    </select>
+
+    <form id="offerForm">
+        <label for="courseInput">Course:</label>
+        <input type="text" id="courseInput" name="course" readonly required/>
+
+        <label for="studentIdInput">Student ID:</label>
+        <input type="text" id="studentIdInput" name="studentId" required/>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4"></textarea>
+
+        <button type="submit">Send Offer</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var courseInput = document.getElementById("courseInput");
+        var tableSelector = document.getElementById("tableSelector");
+        let cm = false;
+        // If not, initialize with the first course
+        courseInput.value = tableSelector.options[tableSelector.selectedIndex].text;
+        courseInput.setAttribute('data-id', tableSelector.value.slice(2));
+        // Event listener for the select element
+        tableSelector.addEventListener("change", function () {
+            var value = this.value;
+            var text = this.options[this.selectedIndex].text;
+            var c_m = !value.startsWith('c-');
+            cm = c_m;
+            courseInput.value = text;
+            courseInput.setAttribute('data-id', value.slice(2));
+            console.log('c_m:', c_m);
+            console.log(courseInput.dataset.id);
+            sessionStorage.setItem("selectedCourse", value);
+        });
+        $("#offerForm").submit(function (event) {
+            // 阻止表单的默认提交行为
+            event.preventDefault();
+
+            // 获取表单字段的数据
+            const id = $("#courseInput").data('id');
+            const studentId = $("#studentIdInput").val();
+            const description = $("#description").val();
+
+            // 创建一个对象来保存你的数据
+            const data = {
+                id: id,
+                cm: cm,
+                studentId: studentId,
+                description: description
+            };
+            // 发送POST请求
+            $.ajax({
+                type: "POST",
+                url: "/lecturers/sendOffer",  // 替换为你的URL
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                success: function (response) {
+                    if (response.code === 1) {
+                        alert("Offer sent successfully!");
+                        window.location.reload();
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

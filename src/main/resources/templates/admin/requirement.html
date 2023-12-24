@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+
+        .major-select {
+            border: 3px solid rgb(37, 37, 166);
+        }
+    </style>
+    <title>concrete major</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin">Index</a>
+    <a href="/admins/majors">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts">Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements" style="background-color: #575757">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>All positions</h3>
+    <!--    <div class="tab" style="margin: 2px">-->
+    <!--        <button class="tablinks">Stage 1</button>-->
+    <!--        <button class="tablinks">Stage 2</button>-->
+    <!--        <button class="tablinks">Stage 3</button>-->
+    <!--        <button class="tablinks">Stage 4</button>-->
+    <!--    </div>-->
+    <!--    <hr/>-->
+    <!--    <div class="major" style="margin: 3px;">-->
+    <!--        <label for="chooseMajor">choose major:</label>-->
+    <!--        <select id="chooseMajor">-->
+    <!--            <option value="1">SE</option>-->
+    <!--            <option value="2">IOT</option>-->
+    <!--            <option value="3">ELE</option>-->
+    <!--            <option value="4">FE</option>-->
+    <!--        </select>-->
+    <!--    </div>-->
+
+    <table id="requirements-table">
+        <thead>
+        <tr>
+            <th style="width: 15%">Class code</th>
+            <th style="width: 15%">Quantity</th>
+            <th style="width: 15%">WorkHours</th>
+            <th style="width: 15%">ClassGrade</th>
+            <th style="width: 10%">Stage limit</th>
+            <th style="width: 15%">Undergrad</th>
+            <th style="width: 15%">Master</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="requirement : ${requirementsList}">
+            <td th:text="${requirement.code}"></td>
+            <td th:text="${requirement.quantity}"></td>
+            <td th:text="${requirement.workHours}"></td>
+            <td th:switch="${requirement.classGrade != null ? requirement.classGrade.name() : null}">
+                <span th:case="'A_plus'">A+</span>
+                <span th:case="'A'">A</span>
+                <span th:case="'A_minus'">A-</span>
+                <span th:case="'B_plus'">B+</span>
+                <span th:case="'B'">B</span>
+                <span th:case="'B_minus'">B-</span>
+                <span th:case="'NONE'">Null</span>
+            </td>
+            <td th:text="${requirement.stageRequirement}"></td>
+            <td th:text="${requirement.undergrad}"></td>
+            <td th:text="${requirement.master}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--<script>-->
+<!--    // 为 tab 按钮添加点击事件监听器-->
+<!--    document.querySelectorAll(".tablinks").forEach(function (btn) {-->
+<!--        btn.addEventListener("click", function () {-->
+<!--            // 移除其它按钮的 'stage' 类-->
+<!--            document.querySelectorAll(".tablinks").forEach(function (otherBtn) {-->
+<!--                otherBtn.classList.remove("stage");-->
+<!--            });-->
+<!--            // 为被点击的按钮添加 'stage' 类-->
+<!--            btn.classList.add("stage");-->
+<!--        });-->
+<!--    });-->
+
+<!--    // 为所有下拉列表添加 onchange 事件监听器-->
+<!--    document.querySelectorAll(".major select").forEach(function (sel) {-->
+<!--        sel.addEventListener("change", function () {-->
+<!--            // 移除其它下拉列表的 'major-select' 类-->
+<!--            document-->
+<!--                .querySelectorAll(".major select")-->
+<!--                .forEach(function (otherSel) {-->
+<!--                    otherSel.classList.remove("major-select");-->
+<!--                });-->
+<!--            // 为选中的下拉列表添加 'major-select' 类-->
+<!--            sel.classList.add("major-select");-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+</body>
+</html>

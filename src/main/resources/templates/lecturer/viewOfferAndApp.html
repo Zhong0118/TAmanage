@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>lecturer views all applications</title>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/lecturers/index_lecturer">Index</a>
+    <a href="/lecturers/requirements">Requirements</a>
+    <a href="/lecturers/offers">Send Offer</a>
+    <a href="/lecturers/viewOfferApp" style="background-color: #575757">Offer&Application</a>
+    <a href="/lecturers/positions">View positions</a>
+    <a href="/lecturers/timetable">Timetable</a>
+
+
+    <div class="user-info" th:text="${lecturer.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Lecturer Page</h1>
+    <hr/>
+    <h3>view all applications and offers</h3>
+    <div class="tab" style="margin: 2px">
+        <button class="tablinks" onclick="showTable(1, this)">
+            applications
+        </button>
+        <button class="tablinks" onclick="showTable(2, this)">offers</button>
+        <button class="tablinks" onclick="showTable(3, this)">options</button>
+    </div>
+
+    <div id="formModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <label for="courseCode">class code:</label>
+                <input type="text" name="courseCode" id="courseCode" disabled/>
+                <div class="form-row">
+                    <label for="studentID">BDIC id:</label>
+                    <select id="studentID" name="studentID" disabled>
+                        <option id="id"></option>
+                    </select>
+                    <label for="studentName">name:</label>
+                    <select id="studentName" name="studentName" disabled>
+                        <option id="name"></option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="studentStage">stage:</label>
+                    <select id="studentStage" name="studentStage" disabled>
+                        <option id="stage"></option>
+                    </select>
+                    <label for="studentMajor">major:</label>
+                    <select id="studentMajor" name="studentMajor" disabled>
+                        <option id="major"></option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="studentGrade">grade:</label>
+                    <select id="studentGrade" name="studentGrade" disabled>
+                        <option id="grade"></option>
+                    </select>
+                    <label for="studentProject">project:</label>
+                    <select id="studentProject" name="studentProject" disabled>
+                        <option id="project"></option>
+                    </select>
+                </div>
+                <label for="description">description:</label>
+                <textarea name="multiLineInput" disabled id="description"></textarea>
+
+                <div style="display: flex; justify-content: space-around;">
+                    <button type="submit" class="accept"></button>
+                    <button type="submit" class="reject"></button>
+                    <button type="submit" class="option">option</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <table class="order order1">
+        <thead>
+        <tr>
+            <th style="width: 25%">Class code</th>
+            <th style="width: 25%">BDIC ID</th>
+            <th style="width: 25%">Name</th>
+            <th style="width: 25%">View Detail</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="a : ${applicationsList}">
+            <td th:text="${a.code}"></td>
+            <td th:text="${a.student.studentId}"></td>
+            <td th:text="${a.student.username}"></td>
+            <td>
+                <button class="viewDetail" th:attr="data-aid=${a.aid}, data-uid=${a.student.uid}">view</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="order order2">
+        <thead>
+        <tr>
+            <th style="width: 25%">Course code</th>
+            <th style="width: 25%">BDIC ID</th>
+            <th style="width: 25%">Name</th>
+            <th style="width: 25%">Status</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="offer : ${offersList}">
+            <td th:text="${offer.code}"></td>
+            <td th:text="${offer.sid}"></td>
+            <td th:text="${offer.username}"></td>
+            <td>
+                <button th:classappend="${offer.status.name() == 'Pending' ? 'waiting' : (offer.status.name() == 'Accepted' ? 'accept disabled' : 'reject disabled')}"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="order order3">
+        <thead>
+        <tr>
+            <th style="width: 25%">Class code</th>
+            <th style="width: 25%">BDIC ID</th>
+            <th style="width: 25%">Name</th>
+            <th style="width: 25%">BE TA</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="a : ${applicationsList2}">
+            <td th:text="${a.code}"></td>
+            <td th:text="${a.student.studentId}"></td>
+            <td th:text="${a.student.username}"></td>
+            <td>
+                <button type="submit" class="accept1" th:attr="data-aid=${a.aid}, data-uid=${a.student.uid}"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr/>
+</div>
+
+<script>
+    function showTable(stageNumber, element) {
+        // Hide all tables
+        var tables = document.querySelectorAll(".order");
+        for (var i = 0; i < tables.length; i++) {
+            tables[i].style.display = "none";
+        }
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        for (var i = 0; i < stageButtons.length; i++) {
+            stageButtons[i].classList.remove("stage");
+        }
+
+        // Add the 'stage' class to the clicked button
+        element.classList.add("stage");
+
+        // Show the selected table
+        var selectedTable = document.querySelector(".order" + stageNumber);
+        if (selectedTable) {
+            selectedTable.style.display = "table";
+        }
+    }
+
+    // Show stage1 table by default when the page loads
+    window.onload = function () {
+        // Trigger the click on the first tab
+        document.querySelector(".tablinks").click();
+    };
+
+    var modal = document.getElementById("formModal");
+
+    var span = document.getElementsByClassName("close")[0];
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+    $(document).ready(function () {
+        // 当点击"view"按钮时
+        $('.accept1').click(function () {
+            const aid = $(this).data('aid');
+            const uid = $(this).data('uid');
+            updateApplicationStatus(uid, aid, 'Accepted');
+        });
+        $(".viewDetail").click(function () {
+            // 获取当前行
+            const tr = $(this).closest('tr');
+
+            // 从当前行获取a.code的值
+            const code = tr.find('td:eq(0)').text();
+
+            // 将a.code的值填充到模态框的表单中
+            $('#courseCode').val(code);
+            // 获取aid
+            const aid = $(this).data('aid');
+            const uid = $(this).data('uid');
+
+            $('.accept, .reject, .option').data('aid', aid).data('uid', uid);
+            // 发送AJAX GET请求
+            $.ajax({
+                url: '/lecturers/applications/' + aid,
+                type: 'GET',
+                success: function (response) {
+                    $('#id').text(response.student.studentId);
+                    $('#name').text(response.student.username);
+                    $('#stage').text(response.student.stage);
+                    $('#major').text(response.student.majorCode);
+                    switch (response.grade) {
+                        case 'A_plus':
+                            $('#grade').text('A+');
+                            break;
+                        case 'A':
+                            $('#grade').text('A');
+                            break;
+                        case 'A_minus':
+                            $('#grade').text('A-');
+                            break;
+                        case 'B_plus':
+                            $('#grade').text('B+');
+                            break;
+                        case 'B':
+                            $('#grade').text('B');
+                            break;
+                        case 'B_minus':
+                            $('#grade').text('B-');
+                            break;
+                        case 'NONE':
+                            $('#grade').text('Null');
+                            break;
+                        default:
+                            $('#grade').text(response.grade);
+                    }
+
+                    switch (response.project) {
+                        case 'A_plus':
+                            $('#project').text('A+');
+                            break;
+                        case 'A':
+                            $('#project').text('A');
+                            break;
+                        case 'A_minus':
+                            $('#project').text('A-');
+                            break;
+                        case 'B_plus':
+                            $('#project').text('B+');
+                            break;
+                        case 'B':
+                            $('#project').text('B');
+                            break;
+                        case 'B_minus':
+                            $('#project').text('B-');
+                            break;
+                        case 'NONE':
+                            $('#project').text('Null');
+                            break;
+                        default:
+                            $('#project').text(response.project);
+                    }
+                    $('#description').val(response.description);
+
+                    // 显示模态框
+                    $('#formModal').show();
+                },
+                error: function (xhr, status, error) {
+                    // 处理错误的响应
+                    alert('Failed to get application details');
+                }
+            });
+
+            $('.accept').click(function () {
+                const aid = $(this).data('aid');
+                const uid = $(this).data('uid');
+                updateApplicationStatus(uid, aid, 'Accepted');
+            });
+            $('.reject').click(function () {
+                const aid = $(this).data('aid');
+                const uid = $(this).data('uid');
+                updateApplicationStatus(uid, aid, 'Rejected');
+            });
+            $('.option').click(function () {
+                const aid = $(this).data('aid');
+                const uid = $(this).data('uid');
+                updateApplicationStatus(uid, aid, 'Alternative');
+            });
+        });
+
+        // 当点击模态框的关闭按钮时，隐藏模态框
+        $(".close").click(function () {
+            $('#formModal').hide();
+        });
+    });
+
+    function updateApplicationStatus(uid, aid, status) {
+        console.log(aid, status)
+        $.ajax({
+            url: '/lecturers/putApplications/' + uid + '/' + aid + '?status=' + status,  // 将 status 添加到 URL 中
+            type: 'PUT',
+            success: function (response) {
+                // 处理成功的响应
+                if (response.code === 1) {
+                    alert('Application status updated successfully');
+                    location.reload(); // 刷新页面
+                } else {
+                    alert(response.msg);
+                }
+            },
+            error: function (xhr, status, error) {
+                // 处理错误的响应
+                alert('Failed to update offer status');
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

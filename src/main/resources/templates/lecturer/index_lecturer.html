@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>lecturer index</title>
+
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/lecturers/index_lecturer" style="background-color: #575757">Index</a>
+    <a href="/lecturers/requirements">Requirements</a>
+    <a href="/lecturers/offers">Send Offer</a>
+    <a href="/lecturers/viewOfferApp">Offer&Application</a>
+    <a href="/lecturers/positions">View positions</a>
+
+    <a href="/lecturers/timetable">Timetable</a>
+
+
+    <div class="user-info" th:text="${lecturer.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1> Lecturer Page</h1>
+    <hr>
+    <h3>Self-info</h3>
+    <table class="self-info">
+        <thead>
+        <tr>
+            <th style="width: 50%;">Information</th>
+            <th>Data</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Name</td>
+            <td th:text="${lecturer.username}"></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td th:text="${lecturer.email}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+</div>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+    <title>admin accounts</title>
+
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin">Index</a>
+    <a href="/admins/majors">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts" style="background-color: #575757">Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>Accounts</h3>
+    <div class="tab" style="margin: 2px;">
+        <button class="tablinks" onclick="showTable(1, this)">
+            Admin
+        </button>
+        <button class="tablinks" onclick="showTable(2, this)">
+            Lecturer
+        </button>
+        <button class="tablinks" onclick="showTable(3, this)">
+            Student
+        </button>
+        <button id="addAdminBtn">Add admin</button>
+        <button id="addLecturerBtn">Add lecturer</button>
+        <button id="addStudentBtn">Add student</button>
+    </div>
+    <hr>
+
+    <div id="addAdmin" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <input type="hidden" name="adminOperation" id="adminOperation" value="post"/>
+                <input type="hidden" name="adminUid" id="adminUid"/>
+                <label for="addAdminName">Add an admin name:</label>
+                <input type="text" name="addAdminName" id="addAdminName" required/>
+                <label for="addAdminEmail">Add an admin email:</label>
+                <input type="email" name="addAdminEmail" id="addAdminEmail" required/>
+                <label for="addAdminPassword">Add an admin password:</label>
+                <input type="password" name="addAdminPassword" id="addAdminPassword" required/>
+
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+
+    <div id="addLecturer" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <input type="hidden" name="lecturerOperation" id="lecturerOperation" value="post"/>
+                <input type="hidden" name="lecturerUid" id="lecturerUid"/>
+                <label for="addLecturerName">Add a teacher name:</label>
+                <input type="text" name="addLecturerName" id="addLecturerName" required/>
+                <label for="addLecturerEmail">Add a teacher email:</label>
+                <input type="email" name="addLecturerEmail" id="addLecturerEmail" required/>
+                <label for="addLecturerPassword">Add a teacher password:</label>
+                <input type="password" name="addLecturerPassword" id="addLecturerPassword" required/>
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+
+    <div id="addStudent" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <input type="hidden" name="studentOperation" id="studentOperation" value="post"/>
+                <input type="hidden" name="studentUid" id="studentUid"/>
+                <label for="addStudentID">Add a student ID:</label>
+                <input type="text" name="addStudentID" id="addStudentID" required/>
+                <label for="addStudentName">Add a student name:</label>
+                <input type="text" name="addStudentName" id="addStudentName" required/>
+                <label for="addStudentEmail">Add a student email:</label>
+                <input type="email" name="addStudentEmail" id="addStudentEmail" required/>
+                <label for="addStudentPassword">Add a student password:</label>
+                <input type="password" name="addStudentPassword" id="addStudentPassword" required/>
+                <label for="chooseMajor">Choose a major:</label>
+                <select id="chooseMajor" name="chooseMajor" required>
+                    <option th:each="major : ${majors}" th:value="${major.majorCode}"
+                            th:text="${major.majorName}"></option>
+                </select>
+                <label for="chooseEducation">Choose a education:</label>
+                <select id="chooseEducation" name="chooseEducation" required>
+                    <option value="UNDERGRAD">UNDERGRAD</option>
+                    <option value="MASTER">MASTER</option>
+                    <option value="PHD">PHD</option>
+                </select>
+                <label for="chooseStage">Choose a stage:</label>
+                <select id="chooseStage" name="chooseStage" required>
+                    <option value="1">stage1</option>
+                    <option value="2">stage2</option>
+                    <option value="3">stage3</option>
+                    <option value="4">stage4</option>
+                </select>
+                <label for="timeLimit">time Limit:</label>
+                <input type="number" name="timeLimit" id="timeLimit" required max="20" min="5"/>
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+    <table class="accounts admin account1">
+        <thead>
+        <tr>
+            <th style="width: 10%">UID</th>
+            <th style="width: 30%">Name</th>
+            <th style="width: 40%">Email</th>
+            <th style="width: 20%">Operations</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${admins}">
+            <td th:text="${user.uid}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.email}"></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-admin" th:attr="data-uid=${user.uid}">
+                        edit
+                    </button>
+                    <button class="del-admin" th:attr="data-uid=${user.uid}">
+                        del
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="accounts lecturer account2">
+        <thead>
+        <tr>
+            <th style="width: 10%">UID</th>
+            <th style="width: 15%">Name</th>
+            <th style="width: 35%">Email</th>
+            <th style="width: 20%">Classes</th>
+            <th style="width: 20%">Operations</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="lecturer : ${lecturers}">
+            <td th:text="${lecturer.uid}"></td>
+            <td th:text="${lecturer.username}"></td>
+            <td th:text="${lecturer.email}"></td>
+            <td>
+                <div th:each="course : ${lecturer.labCourses}" th:text="${course.courseCode}"></div>
+                <div th:each="module : ${lecturer.labModules}" th:text="${module.moduleCode}"></div>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-lecturer" th:attr="data-uid=${lecturer.uid}">
+                        edit
+                    </button>
+                    <button class="del-lecturer" th:attr="data-uid=${lecturer.uid}">
+                        del
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="accounts student account3">
+        <thead>
+        <tr>
+            <th style="width: 5%">UID</th>
+            <th style="width: 10%">BDIC ID</th>
+            <th style="width: 10%">Name</th>
+            <th style="width: 20%">Email</th>
+            <th style="width: 10%">Major</th>
+            <th style="width: 15%">Education</th>
+            <th style="width: 10%">Stage</th>
+            <th style="width: 5%">Time</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="student : ${students}">
+            <td th:text="${student.uid}"></td>
+            <td th:text="${student.studentId}"></td>
+            <td th:text="${student.username}"></td>
+            <td th:text="${student.email}"></td>
+            <td th:text="${student.majorCode}"></td>
+            <td th:text="${student.educationStatus.name()}"></td>
+            <td th:text="${student.stage}"></td>
+            <td th:text="${student.timeLimitation}"></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-student" th:attr="data-uid=${student.uid}">
+                        edit
+                    </button>
+                    <button class="del-student" th:attr="data-uid=${student.uid}">
+                        del
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    function showTable(stageNumber, element) {
+        sessionStorage.setItem("selectedStage", stageNumber); // Save the selected stage
+
+        // Hide all tables
+        var tables = document.querySelectorAll(".accounts");
+        for (var i = 0; i < tables.length; i++) {
+            tables[i].style.display = "none";
+        }
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        for (var i = 0; i < stageButtons.length; i++) {
+            stageButtons[i].classList.remove("stage");
+        }
+
+        // Add the 'stage' class to the clicked button
+        element.classList.add("stage");
+
+        // Show the selected table
+        var selectedTable = document.querySelector(".account" + stageNumber);
+        if (selectedTable) {
+            selectedTable.style.display = "table";
+        }
+    }
+
+    window.onload = function () {
+        var selectedStage = sessionStorage.getItem("selectedStage") || 1; // 从 sessionStorage 中获取选中的 stage，如果不存在则默认为 1
+
+        // 设置选择框的值
+        document.getElementById("chooseStage").value = "stage" + selectedStage;
+
+        // 触发对应的标签点击事件以更新界面
+        var tabToClick = document.querySelector(".tablinks.stage" + selectedStage) || document.querySelector(".tablinks");
+        if (tabToClick) {
+            showTable(selectedStage, tabToClick); // 调用 showTable 来确保一致的行为
+        }
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        stageButtons.forEach(function (button) {
+            button.classList.remove("stage");
+        });
+
+        // Add the 'stage' class to the selected button
+        var selectedButton = document.querySelector(".tablinks.stage" + selectedStage);
+        if (selectedButton) {
+            selectedButton.classList.add("stage");
+        }
+    };
+
+    var modal1 = document.getElementById("addAdmin");
+    var modal2 = document.getElementById("addLecturer");
+    var modal3 = document.getElementById("addStudent");
+
+    var btn1 = document.getElementById("addAdminBtn");
+    var btn2 = document.getElementById("addLecturerBtn");
+    var btn3 = document.getElementById("addStudentBtn");
+
+    var span = document.getElementsByClassName("close")[0];
+    var span1 = document.getElementsByClassName("close")[1];
+    var span2 = document.getElementsByClassName("close")[2];
+
+    btn1.onclick = function () {
+        modal1.style.display = "block";
+        $("#adminOperation").val("post");
+        $("#adminUid").val("");
+        $("#addAdminName").val("");
+        $("#addAdminEmail").val("");
+        $("#addAdminPassword").val("");
+    };
+    btn2.onclick = function () {
+        modal2.style.display = "block";
+        $("#lecturerOperation").val("post");
+        $("#lecturerUid").val("");
+        $("#addLecturerName").val("");
+        $("#addLecturerEmail").val("");
+        $("#addLecturerPassword").val("");
+    };
+    btn3.onclick = function () {
+        modal3.style.display = "block";
+        $("#studentOperation").val("post");
+        $("#studentUid").val("");
+        $("#addStudentID").val("").prop("disabled", false);
+        $("#addStudentName").val("");
+        $("#addStudentEmail").val("");
+        $("#addStudentPassword").val("");
+        $("#chooseMajor").val("");
+        $("#chooseStage").val("1");
+    };
+
+    span.onclick = function () {
+        modal1.style.display = "none";
+    };
+    span1.onclick = function () {
+        modal2.style.display = "none";
+    };
+    span2.onclick = function () {
+        modal3.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal1 || event.target === modal2 || event.target === modal3) {
+            modal1.style.display = "none";
+            modal2.style.display = "none";
+            modal3.style.display = "none";
+        }
+    };
+
+    $(document).ready(function () {
+        $("#addAdminBtn").click(function () {
+            $("#addAdmin").css("display", "block");
+        });
+        $("#addLecturerBtn").click(function () {
+            $("#addLecturer").css("display", "block");
+        });
+        $("#addStudentBtn").click(function () {
+            $("#addStudent").css("display", "block");
+        });
+        $(".edit-admin").click(function () {
+            $("#addAdmin").css("display", "block");
+            $("#adminOperation").val("put");
+            $("#adminUid").val($(this).attr("data-uid"));
+            $("#addAdminName").val($(this).parent().parent().parent().children().eq(1).text());
+            $("#addAdminEmail").val($(this).parent().parent().parent().children().eq(2).text());
+            $("#addAdminPassword").val("");
+        });
+        $(".edit-lecturer").click(function () {
+            $("#addLecturer").css("display", "block");
+            $("#lecturerOperation").val("put");
+            $("#lecturerUid").val($(this).attr("data-uid"));
+            $("#addLecturerName").val($(this).parent().parent().parent().children().eq(1).text());
+            $("#addLecturerEmail").val($(this).parent().parent().parent().children().eq(2).text());
+            $("#addLecturerPassword").val("");
+        });
+        $(".edit-student").click(function () {
+            $("#addStudent").css("display", "block");
+            $("#studentOperation").val("put");
+            $("#studentUid").val($(this).attr("data-uid"));
+            $("#addStudentID").val($(this).parent().parent().parent().children().eq(1).text()).prop("disabled", true);
+            $("#addStudentName").val($(this).parent().parent().parent().children().eq(2).text());
+            $("#addStudentEmail").val($(this).parent().parent().parent().children().eq(3).text());
+            $("#addStudentPassword").val("");
+            $("#chooseMajor").val($(this).parent().parent().parent().children().eq(4).text());
+            $("#chooseEducation").val($(this).parent().parent().parent().children().eq(5).text());
+            $("#chooseStage").val($(this).parent().parent().parent().children().eq(6).text());
+            $("#timeLimit").val($(this).parent().parent().parent().children().eq(7).text());
+        });
+    });
+
+    $('#addAdmin form').submit(function (e) {
+        e.preventDefault();
+        const operation = $("#adminOperation").val();
+        const adminData = {
+            username: $("#addAdminName").val(),
+            email: $("#addAdminEmail").val(),
+            password: $("#addAdminPassword").val(),
+            uid: $("#adminUid").val()
+
+        };
+        if (operation === 'post') {
+            $.ajax({
+                url: '/admins/accounts/addAdmin',
+                type: 'POST',
+                data: JSON.stringify(adminData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code === 1) {
+                        alert("Add admin successfully!");
+                        sessionStorage.setItem("selectedStage", "1"); // Set selectedStage as stage
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function (error) {
+                    alert("Add admin failed!");
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/admins/accounts/updateAdmin',
+                type: 'PUT',
+                data: JSON.stringify(adminData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code === 1) {
+                        alert("Update admin successfully!");
+                        sessionStorage.setItem("selectedStage", "1"); // Set selectedStage as stage
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function (error) {
+                    alert("Update admin failed!");
+                }
+            });
+        }
+    });
+
+    $('#addLecturer form').submit(function (e) {
+        e.preventDefault();
+        const operation = $("#lecturerOperation").val();
+        const adminData = {
+            username: $("#addLecturerName").val(),
+            email: $("#addLecturerEmail").val(),
+            password: $("#addLecturerPassword").val(),
+            uid: $("#lecturerUid").val()
+
+        };
+        if (operation === 'post') {
+            $.ajax({
+                url: '/admins/accounts/addLecturer',
+                type: 'POST',
+                data: JSON.stringify(adminData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code === 1) {
+                        alert("Add lecturer successfully!");
+                        sessionStorage.setItem("selectedStage", "2"); // Set selectedStage as stage
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function (error) {
+                    alert("Add lecturer failed!");
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/admins/accounts/updateLecturer',
+                type: 'PUT',
+                data: JSON.stringify(adminData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code === 1) {
+                        alert("Update lecturer successfully!");
+                        sessionStorage.setItem("selectedStage", "2"); // Set selectedStage as stage
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function (error) {
+                    alert("Update lecturer failed!");
+                }
+            });
+        }
+    });
+
+    $('#addStudent form').submit(function (e) {
+        e.preventDefault();
+        const operation = $("#studentOperation").val();
+        const adminData = {
+            username: $("#addStudentName").val(),
+            email: $("#addStudentEmail").val(),
+            password: $("#addStudentPassword").val(),
+            uid: $("#studentUid").val(),
+            studentId: $("#addStudentID").val(),
+            majorCode: $("#chooseMajor").val(),
+            stage: $("#chooseStage").val(),
+            educationStatus: $("#chooseEducation").val(),
+            timeLimitation: $("#timeLimit").val()
+        };
+        if (operation === 'post') {
+            $.ajax({
+                url: '/admins/accounts/addStudent',
+                type: 'POST',
+                data: JSON.stringify(adminData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code === 1) {
+                        alert("Add student successfully!");
+                        sessionStorage.setItem("selectedStage", "3"); // Set selectedStage as stage
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function (error) {
+                    alert("Add student failed!");
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/admins/accounts/updateStudent',
+                type: 'PUT',
+                data: JSON.stringify(adminData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.code === 1) {
+                        alert("Update student successfully!");
+                        sessionStorage.setItem("selectedStage", "3"); // Set selectedStage as stage
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function (error) {
+                    alert("Update student failed!");
+                }
+            });
+        }
+    });
+
+    $('.del-admin').click(function () {
+        const uid = $(this).attr("data-uid");
+        console.log(uid)
+        $.ajax({
+            url: '/admins/accounts/deleteAdmin',
+            type: 'DELETE',
+            data: JSON.stringify({uid: uid}),
+            contentType: 'application/json',
+            success: function (data) {
+                if (data.code === 1) {
+                    alert("Delete admin successfully!");
+                    sessionStorage.setItem("selectedStage", "1"); // Set selectedStage as stage
+                    location.reload(); // Refresh the page
+                } else {
+                    alert(data.msg);
+                }
+            },
+            error: function (error) {
+                alert("Delete admin failed!");
+            }
+        });
+    });
+
+    $('.del-lecturer').click(function () {
+        const uid = $(this).attr("data-uid");
+        $.ajax({
+            url: '/admins/accounts/deleteLecturer',
+            type: 'DELETE',
+            data: JSON.stringify({uid: uid}),
+            contentType: 'application/json',
+            success: function (data) {
+                if (data.code === 1) {
+                    alert("Delete lecturer successfully!");
+                    sessionStorage.setItem("selectedStage", "2"); // Set selectedStage as stage
+                    location.reload(); // Refresh the page
+                } else {
+                    alert(data.msg);
+                }
+            },
+            error: function (error) {
+                alert("Delete lecturer failed!");
+            }
+        });
+    });
+
+    $('.del-student').click(function () {
+        const uid = $(this).attr("data-uid");
+        console.log(uid)
+        $.ajax({
+            url: '/admins/accounts/deleteStudent',
+            type: 'DELETE',
+            data: JSON.stringify({uid: uid}),
+            contentType: 'application/json',
+            success: function (data) {
+                if (data.code === 1) {
+                    alert("Delete student successfully!");
+                    sessionStorage.setItem("selectedStage", "3"); // Set selectedStage as stage
+                    location.reload(); // Refresh the page
+                } else {
+                    alert(data.msg);
+                }
+            },
+            error: function (error) {
+                alert("Delete student failed!");
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+    <title>admin view applications</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin">Index</a>
+    <a href="/admins/majors">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts">Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application" style="background-color: #575757">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>Applications</h3>
+    <table class="applications">
+        <thead>
+        <tr>
+            <th style="width: 15%">Course code</th>
+            <th style="width: 15%">BDIC ID</th>
+            <th style="width: 10%">Stage</th>
+            <th style="width: 10%">Major</th>
+            <th style="width: 10%">Grade</th>
+            <th style="width: 10%">Project</th>
+            <th style="width: 20%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a:${applicationsList}">
+            <td th:text="${a.code}"></td>
+            <td th:text="${a.student.studentId}"></td>
+            <td th:text="${a.student.stage}"></td>
+            <td th:text="${a.student.majorCode}"></td>
+            <td th:switch="${a.grade.name()}">
+                <span th:case="'A_plus'">A+</span>
+                <span th:case="'A'">A</span>
+                <span th:case="'A_minus'">A-</span>
+                <span th:case="'B_plus'">B+</span>
+                <span th:case="'B'">B</span>
+                <span th:case="'B_minus'">B-</span>
+                <span th:case="'NONE'">Null</span>
+                <span th:case="*">${a.grade}</span>
+            </td>
+            <td th:switch="${a.project.name()}">
+                <span th:case="'A_plus'">A+</span>
+                <span th:case="'A'">A</span>
+                <span th:case="'A_minus'">A-</span>
+                <span th:case="'B_plus'">B+</span>
+                <span th:case="'B'">B</span>
+                <span th:case="'B_minus'">B-</span>
+                <span th:case="'NONE'">Null</span>
+                <span th:case="*">${a.project}</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="accept" th:attr="data-aid=${a.aid}"></button>
+                    <button class="reject" th:attr="data-aid=${a.aid}"></button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr/>
+</div>
+<script>
+    $(document).ready(function () {
+        // Event listener for the accept button
+        $('.accept').click(function () {
+            const aid = $(this).data('aid');
+            updateApplicationStatus(aid, 'AdminAccepted');
+        });
+
+        // Event listener for the reject button
+        $('.reject').click(function () {
+            const aid = $(this).data('aid');
+            updateApplicationStatus(aid, 'Rejected');
+        });
+    });
+
+    function updateApplicationStatus(aid, status) {
+        console.log(aid, status)
+        $.ajax({
+            url: '/admins/applications/' + aid + '?status=' + status,  // 将 status 添加到 URL 中
+            type: 'PUT',
+            success: function (response) {
+                // 处理成功的响应
+                if (response.code === 1) {
+                    alert('Application status updated successfully');
+                    location.reload(); // 刷新页面
+                } else {
+                    alert(response.msg);
+                }
+            },
+            error: function (xhr, status, error) {
+                // 处理错误的响应
+                alert('Failed to update offer status');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

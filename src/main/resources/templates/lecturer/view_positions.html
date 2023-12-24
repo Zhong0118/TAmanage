@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>lecturer view all TAs</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/lecturers/index_lecturer">Index</a>
+    <a href="/lecturers/requirements">Requirements</a>
+    <a href="/lecturers/offers"
+    >Send Offer</a>
+    <a href="/lecturers/viewOfferApp">Offer&Application</a>
+    <a href="/lecturers/positions" style="background-color: #575757">View positions</a>
+    <a href="/lecturers/timetable">Timetable</a>
+
+
+
+    <div class="user-info" th:text="${lecturer.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Lecturer Page</h1>
+    <hr/>
+    <h3>View all TAs</h3>
+    <!--    <select id="tableSelector" onchange="showTable(this.value)">-->
+    <!--        <option value="1">COMP1004J</option>-->
+    <!--        <option value="2">COMP1005J</option>-->
+    <!--        <option value="3">COMP1006J</option>-->
+    <!--        &lt;!&ndash; More options here &ndash;&gt;-->
+    <!--    </select>-->
+    <div id="evaluationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form id="evaluationForm">
+                <label for="evaluation">Evaluation:</label>
+                <select id="evaluation" name="evaluation">
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Very_Good">Very Good</option>
+                    <option value="Poor">Poor</option>
+                </select>
+                <input type="submit" value="Submit" id="submit">
+            </form>
+        </div>
+    </div>
+
+    <table class="TAs TAs1">
+        <thead>
+        <tr>
+            <th style="width: 20%">Code</th>
+            <th style="width: 20%">BDIC ID</th>
+            <th style="width: 10%">Name</th>
+            <th style="width: 20%">Evaluation</th>
+            <th style="width: 10%">Stage</th>
+            <th style="width: 20%">Operation</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="p : ${positionsList}">
+            <td th:text="${p.code}"></td>
+            <td th:text="${p.student.studentId}"></td>
+            <td th:text="${p.student.username}"></td>
+            <td th:text="${p.evaluation}"></td>
+            <td th:text="${p.student.stage}"></td>
+            <td>
+                <button class="evaluate" th:attr="data-pid=${p.pid}">evaluate</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!--    <table class="TAs TAs2">-->
+    <!--        <thead>-->
+    <!--        <tr>-->
+    <!--            <th style="width: 20%">BDIC ID</th>-->
+    <!--            <th style="width: 20%">Name</th>-->
+    <!--            <th style="width: 20%">Evaluation</th>-->
+    <!--            <th style="width: 20%">Stage</th>-->
+    <!--            <th style="width: 20%">Operation</th>-->
+    <!--        </tr>-->
+    <!--        </thead>-->
+
+    <!--        <tbody>-->
+    <!--        <tr>-->
+    <!--            <td>21207315</td>-->
+    <!--            <td>Xuzhong22</td>-->
+    <!--            <td>excellent</td>-->
+    <!--            <td>stage 3</td>-->
+    <!--            <td>-->
+    <!--                <button>evaluate</button>-->
+    <!--            </td>-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>21207525</td>-->
+    <!--            <td>NNNN22</td>-->
+    <!--            <td>very good</td>-->
+    <!--            <td>stage 3</td>-->
+    <!--            <td>-->
+    <!--                <button>evaluate</button>-->
+    <!--            </td>-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>21372128</td>-->
+    <!--            <td>ZZZ22</td>-->
+    <!--            <td>poor</td>-->
+    <!--            <td>PhD</td>-->
+    <!--            <td>-->
+    <!--                <button>evaluate</button>-->
+    <!--            </td>-->
+    <!--        </tr>-->
+    <!--        </tbody>-->
+    <!--    </table>-->
+
+    <!--    <table class="TAs TAs3">-->
+    <!--        <thead>-->
+    <!--        <tr>-->
+    <!--            <th style="width: 20%">BDIC ID</th>-->
+    <!--            <th style="width: 20%">Name</th>-->
+    <!--            <th style="width: 20%">Evaluation</th>-->
+    <!--            <th style="width: 20%">Stage</th>-->
+    <!--            <th style="width: 20%">Operation</th>-->
+    <!--        </tr>-->
+    <!--        </thead>-->
+
+    <!--        <tbody>-->
+    <!--        <tr>-->
+    <!--            <td>21207315</td>-->
+    <!--            <td>Xuzhong33</td>-->
+    <!--            <td>good</td>-->
+    <!--            <td>stage 3</td>-->
+    <!--            <td>-->
+    <!--                <button>evaluate</button>-->
+    <!--            </td>-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>21207525</td>-->
+    <!--            <td>NNNN33</td>-->
+    <!--            <td>poor</td>-->
+    <!--            <td>stage 3</td>-->
+    <!--            <td>-->
+    <!--                <button>evaluate</button>-->
+    <!--            </td>-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>21372128</td>-->
+    <!--            <td>ZZZ33</td>-->
+    <!--            <td></td>-->
+    <!--            <td>PhD</td>-->
+    <!--            <td>-->
+    <!--                <button>evaluate</button>-->
+    <!--            </td>-->
+    <!--        </tr>-->
+    <!--        </tbody>-->
+    <!--    </table>-->
+</div>
+
+<script>
+    $(document).ready(function () {
+        // 获取模态框
+        var modal = document.getElementById("evaluationModal");
+        let pid = 0;
+
+        // 获取关闭按钮
+        var close = document.getElementsByClassName("close")[0];
+
+        // 当用户点击"evaluate"按钮时，显示模态框
+        $(".evaluate").click(function () {
+            pid = $(this).data('pid');
+            console.log(pid);
+            modal.style.display = "block";
+        });
+
+        // 当用户点击关闭按钮时，隐藏模态框
+        close.onclick = function () {
+            modal.style.display = "none";
+        }
+        // Event listener for the reject button
+        $('#submit').click(function () {
+            const evaluation = $('#evaluation').val();
+            updatePositionStatus(pid, evaluation);
+        });
+
+
+    });
+
+    function updatePositionStatus(pid, evaluation) {
+        $.ajax({
+            url: '/lecturers/putPositions/' + pid + '?evaluation=' + evaluation,  // 将 status 添加到 URL 中
+            type: 'PUT',
+            success: function (response) {
+                // 处理成功的响应
+                if (response.code === 1) {
+                    alert('Position evaluation updated successfully');
+                    location.reload(); // 刷新页面
+                } else {
+                    alert(response.msg);
+                }
+            },
+            error: function (xhr, status, error) {
+                // 处理错误的响应
+                alert('Failed to update offer status');
+            }
+        });
+    }
+
+    // function showTable(tableNumber) {
+    //     // Hide all tables
+    //     var tables = document.querySelectorAll("table[class^='TAs']");
+    //     for (var i = 0; i < tables.length; i++) {
+    //         tables[i].style.display = "none";
+    //     }
+    //
+    //     // Show the selected table
+    //     var selectedTable = document.querySelector(".TAs" + tableNumber);
+    //     if (selectedTable) {
+    //         selectedTable.style.display = "table";
+    //     }
+    // }
+    //
+    // // Attach the showTable function to the onchange event of the select element
+    // document.getElementById("tableSelector").onchange = function () {
+    //     showTable(this.value);
+    // };
+    //
+    // // Initialize the page with the first table visible
+    // window.onload = function () {
+    //     showTable(document.getElementById("tableSelector").value);
+    // };
+</script>
+</body>
+</html>

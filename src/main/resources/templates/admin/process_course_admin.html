@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+
+    </style>
+    <title>admin handle courses</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin">Index</a>
+    <a href="/admins/majors">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts">Accounts</a>
+    <a href="/admins/classModify" style="background-color: #575757">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>Processing courses application</h3>
+    <div class="tab" style="margin: 2px;">
+        <button class="tablinks" onclick="showTable(1, this)">
+            pending
+        </button>
+        <button class="tablinks" onclick="showTable(2, this)">
+            completed
+        </button>
+    </div>
+    <hr>
+    <table class="pro processing1">
+        <thead>
+        <tr>
+            <th style="width: 20%">StudentId</th>
+            <th style="width: 20%">Name</th>
+            <th style="width: 20%">Course code</th>
+            <th style="width: 20%">purpose</th>
+            <th style="width: 20%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courseList}">
+            <td th:text="${course.student.studentId}"></td>
+            <td th:text="${course.student.username}"></td>
+            <td th:text="${course.courseCode}"></td>
+            <td class="purpose" th:text="${course.purpose.name()}"></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="accept" th:attr="data-uid=${course.student.uid}, data-cid=${course.courseCode}"
+                            value="Accepted">
+                    </button>
+                    <button class="reject" th:attr="data-uid=${course.student.uid}, data-cid=${course.courseCode}"
+                            value="Rejected">
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="pro processing2">
+        <thead>
+        <tr>
+            <th style="width: 20%">StudentId</th>
+            <th style="width: 20%">Name</th>
+            <th style="width: 20%">Course code</th>
+            <th style="width: 20%">purpose</th>
+            <th style="width: 20%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courseList1}">
+            <td th:text="${course.student.studentId}"></td>
+            <td th:text="${course.student.username}"></td>
+            <td th:text="${course.courseCode}"></td>
+            <td class="purpose" th:text="${course.purpose.name()}"></td>
+            <td>
+                <button disabled
+                        th:classappend="${course.status.name() == 'Rejected' ? 'reject disabled' : (course.status.name() == 'Accepted' ? 'accept disabled' : 'waiting')}"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    function showTable(stageNumber, element) {
+        // Hide all tables
+        var tables = document.querySelectorAll(".pro");
+        for (var i = 0; i < tables.length; i++) {
+            tables[i].style.display = "none";
+        }
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        for (var i = 0; i < stageButtons.length; i++) {
+            stageButtons[i].classList.remove("stage");
+        }
+
+        // Add the 'stage' class to the clicked button
+        element.classList.add("stage");
+
+        // Show the selected table
+        var selectedTable = document.querySelector(".processing" + stageNumber);
+        if (selectedTable) {
+            selectedTable.style.display = "table";
+        }
+    }
+
+    // Show stage1 table by default when the page loads
+    window.onload = function () {
+        // Trigger the click on the first tab
+        document.querySelector(".tablinks").click();
+    };
+
+    $(document).ready(function () {
+        // Event listener for the accept button
+        $('.accept').click(function () {
+            const uid = $(this).data('uid');
+            const courseCode = $(this).data('cid')
+            updateClassModifyStatus(uid, courseCode, 'Accepted');
+        });
+
+        // Event listener for the reject button
+        $('.reject').click(function () {
+            const uid = $(this).data('uid');
+            const courseCode = $(this).data('cid')
+            updateClassModifyStatus(uid, courseCode, 'Rejected');
+        });
+    });
+
+    function updateClassModifyStatus(uid, courseCode, status) {
+        console.log(uid, status)
+        $.ajax({
+            url: '/admins/putClass/' + uid + '?courseCode=' + courseCode + '&status=' + status,  // 将 status 添加到 URL 中
+            type: 'PUT',
+            success: function (response) {
+                // 处理成功的响应
+                if (response.code === 1) {
+                    alert('ClassModify status updated successfully');
+                    location.reload();
+                } else {
+                    alert(response.msg);
+                }
+            },
+            error: function (xhr, status, error) {
+                // 处理错误的响应
+                alert('Failed to update offer status');
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

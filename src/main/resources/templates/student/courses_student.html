@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>student handle courses</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/students/index_student">Index</a>
+    <a href="/students/courses" style="background-color: #575757">Courses</a>
+    <a href="/students/application">Apply for TA</a>
+    <a href="/students/viewAPPOffer">Application&Offer</a>
+    <a href="/students/positions">Pers.Positions</a>
+
+    <a href="/students/timetable">Timetable</a>
+
+    <div class="user-info" th:text="${student.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Student Page</h1>
+    <hr/>
+    <h3>Courses</h3>
+    <div class="tab" style="margin: 2px">
+        <button class="tablinks" onclick="showTable(1, this)">
+            all courses
+        </button>
+        <button class="tablinks" onclick="showTable(2, this)">results</button>
+        <button id="addition" style="margin: 2px">add course</button>
+    </div>
+
+    <div id="formModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <input type="hidden" id="uid" th:value="${student.uid}">
+                <label for="addCourseCode">Add a course code:</label>
+                <input type="text" name="addCourseCode" id="addCourseCode"/>
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+
+    <table class="pro processing1">
+        <thead>
+        <tr>
+            <th style="width: 30%">Course code</th>
+            <th style="width: 20%">Operation</th>
+            <th style="width: 25%">Status</th>
+            <th style="width: 25%">purpose</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="course: ${courses}"
+            th:class="${course.status != null && course.status.name() == 'Pending' ? 'pending' : ''}">
+            <td th:text="${course.courseCode}"></td>
+            <td>
+                <button class="reject" th:if="${course.purpose == null}" th:value="${course.cid}" th:attr="data-uid=${student.uid}"></button>
+            </td>
+            <td th:if="${course.status != null}" th:text="${course.status.name()}"></td>
+            <td class="purpose" th:if="${course.purpose != null}" th:text="${course.purpose.name()}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="pro processing2">
+        <thead>
+        <tr>
+            <th style="width: 30%">Course code</th>
+            <th style="width: 30%">Operation</th>
+            <th style="width: 40%">purpose</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="course : ${resultCourses}">
+            <td th:text="${course.courseCode}"></td>
+            <td>
+                <button disabled th:classappend="${course.status.name() == 'Rejected' ? 'reject disabled' : (course.status.name() == 'Accepted' ? 'accept disabled' : 'waiting')}"></button>
+            </td>
+            <td th:text="${course.purpose.name()}" class="purpose"></td>
+
+        </tr>
+        </tbody>
+    </table>
+    <hr/>
+</div>
+
+<script>
+    function showTable(stageNumber, element) {
+        // Hide all tables
+        var tables = document.querySelectorAll(".pro");
+        for (var i = 0; i < tables.length; i++) {
+            tables[i].style.display = "none";
+        }
+
+        // Remove the 'stage' class from all buttons
+        var stageButtons = document.querySelectorAll(".tablinks");
+        for (var i = 0; i < stageButtons.length; i++) {
+            stageButtons[i].classList.remove("stage");
+        }
+
+        // Add the 'stage' class to the clicked button
+        element.classList.add("stage");
+
+        // Show the selected table
+        var selectedTable = document.querySelector(".processing" + stageNumber);
+        if (selectedTable) {
+            selectedTable.style.display = "table";
+        }
+    }
+
+    // Show stage1 table by default when the page loads
+    window.onload = function () {
+        // Trigger the click on the first tab
+        document.querySelector(".tablinks").click();
+    };
+
+    var modal = document.getElementById("formModal");
+
+    var btn = document.getElementById("addition");
+
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function () {
+        modal.style.display = "block";
+    };
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    $(document).ready(function () {
+        $(".reject").click(function() {
+            const cid = $(this).val();
+            const uid = $(this).data('uid');
+            $.ajax({
+                url: "/students/rejectCourse/" + uid + "/" + cid,
+                type: "POST",
+                data: { cid: cid, uid: uid },
+                success: function(response) {
+                    if (response.code === 1) {
+                        alert("Reject message send successfully");
+                        location.reload();
+                    } else {
+                        alert(response.msg);
+                    }
+                    alert("Data Loaded: " + response);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
+        });
+
+        $("#formModal form").submit(function (event) {
+            event.preventDefault();
+            const uid = $("#uid").val();
+            const courseCode = $("#addCourseCode").val();
+            console.log(courseCode)
+            $.ajax({
+                url: "/students/addCourse/" + uid + "?courseCode=" + courseCode,
+                type: "POST",
+                success: function(response) {
+                    if (response.code === 1) {
+                        alert("Add course message send successfully");
+                        location.reload();
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
+        });
+
+    });
+
+
+</script>
+</body>
+</html>

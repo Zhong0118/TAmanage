@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .stage {
+            border-bottom: 2px solid #031f3b8d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25),
+            0 6px 20px rgba(0, 0, 0, 0.23);
+            background-color: #003366;
+        }
+    </style>
+    <title>admin view modules</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin" >Index</a>
+    <a href="/admins/majors" >Majors</a>
+    <a href="/admins/modules" style="background-color: #575757">Modules</a>
+    <a href="/admins/accounts" >Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>Modules</h3>
+    <button id="addModule" style=" margin: 2px">
+        add a new module
+    </button>
+    <hr>
+    <table class="modules">
+        <thead>
+        <tr>
+            <th style="width: 12%">Module code</th>
+            <th style="width: 15%">Title</th>
+            <th style="width: 10%">Trimester</th>
+            <th style="width: 10%">Type</th>
+            <th style="width: 8%">Lecturer</th>
+            <th style="width: 10%">Day</th>
+            <th style="width: 10%">Timeslot</th>
+            <th style="width: 10%">Majors</th>
+            <th style="width: 15%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="module : ${modules}">
+            <td th:text="${module.moduleCode}"></td>
+            <td th:text="${module.moduleName}"></td>
+            <td th:text="${module.trimester}"></td>
+            <td th:text="${module.type}"></td>
+            <td th:text="${module.lecturer.username}"></td>
+            <td th:text="${module.day}"></td>
+            <td th:switch="${module.timeslot.name()}">
+                <div th:case="'Morning1'">08:00-09:35</div>
+                <div th:case="'Morning2'">09:55-11:30</div>
+                <div th:case="'Afternoon1'">13:30-15:05</div>
+                <div th:case="'Afternoon2'">15:25-17:00</div>
+                <div th:case="'Evening1'">18:00-19:35</div>
+                <div th:case="'Evening2'">19:55-21:30</div>
+            </td>
+            <td>
+                <div th:each="major : ${majorsForEachModule[module.moduleCode]}">
+                    <span th:text="${major.majorCode}"></span><br/>
+                </div>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-course-btn" th:if="${module.type.name() == 'Lab'}" th:attr="data-code=${module.moduleCode},
+                    data-mid=${module.mid}, data-type=${module.type}, data-stage=${module.stage}">edit
+                    </button>
+                    <button class="delete-course-btn" th:if="${module.type.name() == 'Lab'}" th:attr="data-code=${module.moduleCode},
+                    data-mid=${module.mid}, data-type=${module.type}">del
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <div id="formModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <input type="hidden" name="operationType" id="operationType" value="post"/>
+                <input type="hidden" name="moduleId" id="moduleId"/>
+                <label for="addModuleCode">Add a module code:</label>
+                <input type="text" name="addModuleCode" id="addModuleCode" required/>
+                <label for="addMajorTitle">Add a module title:</label>
+                <input type="text" name="addMajorTitle" id="addMajorTitle" required/>
+                <label for="addCourseTrimester">Choose a trimester:</label>
+                <select id="addCourseTrimester" name="addCourseTrimester" required>
+                    <option value="Autumn">Autumn</option>
+                    <option value="Spring">Spring</option>
+                </select>
+                <label for="chooseStage">Choose a stage:</label>
+                <select id="chooseStage" name="chooseStage" required>
+                    <option value="1">stage1</option>
+                    <option value="2">stage2</option>
+                    <option value="3">stage3</option>
+                    <option value="4">stage4</option>
+                </select>
+                <label for="addModuleLecturer">Add a lecturer:</label>
+                <input
+                        type="text"
+                        name="addModuleLecturer"
+                        id="addModuleLecturer"
+                        required
+                />
+
+                <label>Choose majors:</label>
+                <div class="options">
+                    <th:block th:each="major : ${majors}">
+                        <label class="checkbox-container">
+                            <input type="checkbox" name="majorsChoice" th:value="${major.majorCode}"
+                                   th:text="${major.majorCode}"/>
+                            <span class="checkmark"></span>
+                        </label>
+                    </th:block>
+                </div>
+                <div class="form-row">
+                    <label for="chooseLecture">lecture:</label>
+                    <select id="chooseLecture" name="chooseLecture" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                    <label for="chooseLectureTime">lecture time:</label>
+                    <select id="chooseLectureTime" name="chooseLectureTime" required>
+                        <optgroup label="morning">
+                            <option value="Morning1">08:00-09:35</option>
+                            <option value="Morning2">09:55-11:30</option>
+                        </optgroup>
+                        <optgroup label="afternoon">
+                            <option value="Afternoon1">13:30-15:05</option>
+                            <option value="Afternoon2">15:25-17:00</option>
+                        </optgroup>
+                        <optgroup label="evening">
+                            <option value="Evening1">18:00-19:35</option>
+                            <option value="Evening2">19:55-21:30</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="chooseLab">lab:</label>
+                    <select id="chooseLab" name="chooseLab" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                    <label for="chooseLabTime">lab time:</label>
+                    <select id="chooseLabTime" name="chooseLabTime" required>
+                        <optgroup label="morning">
+                            <option value="Morning1">08:00-09:35</option>
+                            <option value="Morning2">09:55-11:30</option>
+                        </optgroup>
+                        <optgroup label="afternoon">
+                            <option value="Afternoon1">13:30-15:05</option>
+                            <option value="Afternoon2">15:25-17:00</option>
+                        </optgroup>
+                        <optgroup label="evening">
+                            <option value="Evening1">18:00-19:35</option>
+                            <option value="Evening2">19:55-21:30</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var modal = document.getElementById("formModal");
+
+    var btn = document.getElementById("addModule");
+
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function () {
+        modal.style.display = "block";
+        $('#operationType').val('post');
+        $('#moduleId').val('');
+        $('#addModuleCode').val('').prop('disabled', false);
+        $('#addModuleTitle').val('');
+        $('#addModuleTrimester').val('');
+        $('#addModuleLecturer').val('');
+        $('#chooseStage').prop('disabled', false);
+        $('#chooseLecture').val('Monday');
+        $('#chooseLectureTime').val('Morning1');
+        $('#chooseLab').val('Monday');
+        $('#chooseLabTime').val('Morning1');
+    };
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    $('.edit-course-btn').click(function () {
+        // 获取当前行
+        var row = $(this).closest('tr');
+        const stage = $(this).data('stage');
+
+        // 从当前行获取需要的值
+        var moduleId = $(this).data('mid');
+        console.log(moduleId);
+        var moduleCode = row.find('td:eq(0)').text();
+        var moduleName = row.find('td:eq(1)').text();
+        var trimester = row.find('td:eq(2)').text();
+        var day = row.find('td:eq(4)').text();
+        var timeslot = row.find('td:eq(5)').text();
+
+        // 将获取的值填入到表单中
+        $('#moduleId').val(moduleId);
+        $('#chooseStage').val(stage).prop('disabled', true);
+        $('#addModuleCode').val(moduleCode).prop('disabled', true);
+        $('#addModuleTitle').val(moduleName);
+        $('#addModuleTrimester').val(trimester);
+        $('#chooseLecture').val(day);
+        $('#chooseLectureTime').val(timeslot);
+
+        $('#operationType').val('put');
+        // 显示模态框
+        $('#formModal').show();
+    });
+
+    // 表单提交事件
+    $('#formModal form').submit(function (event) {
+        const operationType = $('#operationType').val();
+        const day1 = $('#chooseLecture').val();
+        const timeslot1 = $('#chooseLectureTime').val();
+        const day2 = $('#chooseLab').val();
+        const timeslot2 = $('#chooseLabTime').val();
+        if (day1 === day2 && timeslot1 === timeslot2){
+            alert('The lecture and lab cannot be held at the same time.');
+            event.preventDefault();
+        } else if ($('input[name="majorsChoice"]:checked').length <= 1) {
+            alert('Please select at least two major.');
+            event.preventDefault();
+        } else {
+            event.preventDefault();
+            // 收集表单数据
+            const moduleData = {
+                moduleCode: $('#addModuleCode').val(),
+                moduleName: $('#addMajorTitle').val(),
+                trimester: $('#addCourseTrimester').val(),
+                stage: $('#chooseStage').val(),
+                lectureDay: day1,
+                lectureTime: timeslot1,
+                labDay: day2,
+                labTime: timeslot2,
+                lecturerId: $('#addModuleLecturer').val(),
+                majors: [],
+                mid: $('#moduleId').val()
+            };
+
+            // 获取所有选中的专业
+            $('input[name="majorsChoice"]:checked').each(function () {
+                moduleData.majors.push($(this).val());
+            });
+
+            console.log(moduleData);
+            // 发送 AJAX 请求
+            if (operationType === 'post'){
+                $.ajax({
+                    url: '/admins/modules/addModule',  // 更改为您的 API 端点
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(moduleData),
+                    success: function (response) {
+                        // 处理成功的响应
+                        if (response.code === 1){
+                            alert('add module successfully');
+                            location.reload(); // 刷新页面
+                        } else {
+                            alert(response.msg);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // 处理错误的响应
+                        alert('add module failed');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: '/admins/modules/updateModule',  // 更改为您的 API 端点
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(moduleData),
+                    success: function (response) {
+                        // 处理成功的响应
+                        if (response.code === 1){
+                            alert('update module successfully');
+                            location.reload(); // 刷新页面
+                        } else {
+                            alert(response.msg);
+                        }
+
+                    },
+                    error: function (xhr, status, error) {
+                        // 处理错误的响应
+                        alert('update module failed');
+                    }
+                });
+            }
+        }
+    });
+
+    $('.delete-course-btn').click(function () {
+        const courseCode = $(this).data('code');
+        const mid = $(this).data('mid');
+        if (mid && courseCode){
+            if (confirm('Are you sure to delete this module?')){
+                $.ajax({
+                    url: '/admins/modules/deleteModule',  // 更改为您的 API 端点
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        moduleCode: courseCode,
+                        mid: mid
+                    }),
+                    success: function (response) {
+                        // 处理成功的响应
+                        if (response.code === 1){
+                            alert('delete module successfully');
+                            location.reload(); // 刷新页面
+                        } else {
+                            alert(response.msg);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // 处理错误的响应
+                        alert('delete module failed');
+                    }
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

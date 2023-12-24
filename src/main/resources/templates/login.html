@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/log_reg.css}" />
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>Login page</title>
+</head>
+<body>
+
+<form>
+    <div class="container">
+        <h1>Login</h1>
+        <p>Please log in to the system</p>
+        <hr>
+
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" id="username" required>
+
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+
+        <hr>
+
+        <button type="submit" class="loginbtn">Login</button>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        $('form').on('submit', function (event) {
+            event.preventDefault(); // 阻止表单的默认提交行为
+            let userData = {
+                username: $('#username').val(),
+                password: $('#psw').val() // 注意：确保这里的键与后端接收的字段名匹配
+            };
+            $.ajax({
+                url: '/loginValidate', // 后端登录接口的 URL
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(userData),
+                success: function (response) {
+                    if (response.code === 1) {
+                        window.location.href = response.redirectUrl; // 使用后端提供的 URL 进行跳转
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+                error: function () {
+                    alert('Login failed.');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

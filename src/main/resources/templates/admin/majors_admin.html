@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>admin view majors</title>
+
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/admins/index_admin" >Index</a>
+    <a href="/admins/majors" style="background-color: #575757">Majors</a>
+    <a href="/admins/modules">Modules</a>
+    <a href="/admins/accounts" >Accounts</a>
+    <a href="/admins/classModify">Process Course</a>
+    <a href="/admins/application">Applications</a>
+    <a href="/admins/requirements">Requirements</a>
+    <a href="/admins/offers">Offers</a>
+    <a href="/admins/positions">Positions</a>
+
+    <div class="user-info" th:text="${admin.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Admin Page</h1>
+    <hr/>
+    <h3>Majors</h3>
+    <button id="addMajor" style="margin: 2px;">add a new major</button>
+    <hr/>
+    <table class="majors">
+        <thead>
+        <tr>
+            <th style="width: 10%">Code</th>
+            <th style="width: 40%">Major-name</th>
+            <th style="width: 10%">Stage 1</th>
+            <th style="width: 10%">Stage 2</th>
+            <th style="width: 10%">Stage 3</th>
+            <th style="width: 10%">Stage 4</th>
+            <th style="width: 10%">Operation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="major, iterStat : ${majors}">
+            <td th:text="${major.majorCode}"></td>
+            <td th:text="${major.majorName}"></td>
+            <td th:text="${classesCountForEachMajorAndStage[iterStat.index][0]}"></td>
+            <td th:text="${classesCountForEachMajorAndStage[iterStat.index][1]}"></td>
+            <td th:text="${classesCountForEachMajorAndStage[iterStat.index][2]}"></td>
+            <td th:text="${classesCountForEachMajorAndStage[iterStat.index][3]}"></td>
+            <td>
+                <button th:data-major-id="${major.mid}" class="manage-btn">
+                    manage
+                </button>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <hr/>
+
+    <div id="formModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form>
+                <label for="addMajorCode">Add a major code:</label>
+                <input type="text" name="addMajorCode" id="addMajorCode" required/>
+                <label for="addMajorName">Add a major name:</label>
+                <input type="text" name="addMajorName" id="addMajorName" required/>
+
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#formModal').submit(function (event) {
+            event.preventDefault(); // 阻止表单的默认提交行为
+
+            const addMajorCode = $('#addMajorCode').val();
+            const addMajorName = $('#addMajorName').val();
+            console.log(addMajorCode);
+            $.ajax({
+                url: '/admins/addMajor', // 您的API端点
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    majorCode: addMajorCode,
+                    majorName: addMajorName
+                }),
+                success: function (response) {
+                    console.log(response); // 打印整个响应对象进行调试
+                    if (response.code === 1) {
+                        const newMajor = response.data;
+                        console.log(newMajor); // 检查 newMajor 对象的内容
+                        window.location.reload();
+                    } else {
+                        alert(response.msg);
+                    }
+                },
+
+            });
+        });
+
+        // 设置模态弹窗的关闭逻辑
+        $('#addMajor').click(function () {
+            $('#formModal').show();
+        });
+
+        $('.close').click(function () {
+            $('#formModal').hide();
+        });
+
+        $(window).click(function (event) {
+            if (event.target.id === 'formModal') {
+                $('#formModal').hide();
+            }
+        });
+        $('.majors').on('click', '.manage-btn', function () {
+            const majorId = $(this).data('major-id');
+            window.location.href = '/admins/majors/' + majorId;
+        });
+    });
+</script>
+
+</body>
+</html>

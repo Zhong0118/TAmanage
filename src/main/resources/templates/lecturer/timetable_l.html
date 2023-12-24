@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>lecturer timetable</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/lecturers/index_lecturer">Index</a>
+    <a href="/lecturers/requirements">Requirements</a>
+    <a href="/lecturers/offers">Send Offer</a>
+    <a href="/lecturers/viewOfferApp">Offer&Application</a>
+    <a href="/lecturers/positions">View positions</a>
+    <a href="/lecturers/timetable" style="background-color: #575757"
+    >Timetable</a
+    >
+
+    <div class="user-info" th:text="${lecturer.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+    <h1>Lecturer Page</h1>
+    <hr/>
+    <h3>Timetable</h3>
+    <table class="timetable">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>08:00-09:35</td>
+            <td>
+                <div class="Morning1 Monday"></div>
+            </td>
+            <td>
+                <div class="Morning1 Tuesday"></div>
+            </td>
+            <td>
+                <div class="Morning1 Wednesday"></div>
+            </td>
+            <td>
+                <div class="Morning1 Thursday"></div>
+            </td>
+            <td>
+                <div class="Morning1 Friday"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>09:55-11:30</td>
+            <td>
+                <div class="Morning2 Monday"></div>
+            </td>
+            <td>
+                <div class="Morning2 Tuesday"></div>
+            </td>
+            <td>
+                <div class="Morning2 Wednesday"></div>
+            </td>
+            <td>
+                <div class="Morning2 Thursday"></div>
+            </td>
+            <td>
+                <div class="Morning2 Friday"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>13:30-15:05</td>
+            <td>
+                <div class="Afternoon1 Monday"></div>
+            </td>
+            <td>
+                <div class="Afternoon1 Tuesday"></div>
+            </td>
+            <td>
+                <div class="Afternoon1 Wednesday"></div>
+            </td>
+            <td>
+                <div class="Afternoon1 Thursday"></div>
+            </td>
+            <td>
+                <div class="Afternoon1 Friday"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>15:25-17:00</td>
+            <td>
+                <div class="Afternoon2 Monday"></div>
+            </td>
+            <td>
+                <div class="Afternoon2 Tuesday"></div>
+            </td>
+            <td>
+                <div class="Afternoon2 Wednesday"></div>
+            </td>
+            <td>
+                <div class="Afternoon2 Thursday"></div>
+            </td>
+            <td>
+                <div class="Afternoon2 Friday"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>18:00-19:35</td>
+            <td>
+                <div class="Evening1 Monday"></div>
+            </td>
+            <td>
+                <div class="Evening1 Tuesday"></div>
+            </td>
+            <td>
+                <div class="Evening1 Wednesday"></div>
+            </td>
+            <td>
+                <div class="Evening1 Thursday"></div>
+            </td>
+            <td>
+                <div class="Evening1 Friday"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>19:55-21:30</td>
+            <td>
+                <div class="Evening2 Monday"></div>
+            </td>
+            <td>
+                <div class="Evening2 Tuesday"></div>
+            </td>
+            <td>
+                <div class="Evening2 Wednesday"></div>
+            </td>
+            <td>
+                <div class="Evening2 Thursday"></div>
+            </td>
+            <td>
+                <div class="Evening2 Friday"></div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <hr/>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        // 假设你的数据存储在一个名为"data"的数组中
+        let courses = /*[[${courses}]]*/ [];
+        let modules = /*[[${modules}]]*/ [];
+
+        // 遍历课程数据
+        $.each(courses, function (i, course) {
+            // 找到对应的格子
+            let cell = $('.' + course.day + '.' + course.timeslot);
+
+            // 将课程的code添加到格子中
+            cell.text(course.courseCode);
+
+            // 根据课程的type为格子添加一个新的类
+            cell.addClass(course.type === 'Lecture' ? 'lecturers' : 'labs');
+        });
+
+        // 遍历模块数据
+        $.each(modules, function (i, module) {
+            // 找到对应的格子
+            let cell = $('.' + module.day + '.' + module.timeslot);
+
+            // 将模块的code添加到格子中
+            cell.text(module.moduleCode);
+
+            // 根据模块的type为格子添加一个新的类
+            cell.addClass(module.type === 'Lecture' ? 'lecturers' : 'labs');
+        });
+    });
+</script>
+</body>
+</html>

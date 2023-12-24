@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/model.css}"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <title>student personal positions</title>
+</head>
+<body>
+<div class="sidenav">
+    <h2>TA Management</h2>
+    <a href="/students/index_student" >Index</a>
+    <a href="/students/courses">Courses</a>
+    <a href="/students/application">Apply for TA</a>
+    <a href="/students/viewAPPOffer">Application&Offer</a>
+    <a href="/students/positions" style="background-color: #575757">Pers.Positions</a>
+
+
+    <a href="/students/timetable">Timetable</a>
+    <div class="user-info" th:text="${student.username}"></div>
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+
+<div class="main">
+    <h1>Student Page</h1>
+    <hr/>
+    <h3>View all TAs</h3>
+    <table class="pers-position">
+        <thead>
+        <tr>
+            <th style="width: 50%">Class code</th>
+            <th style="width: 50%">Evaluation</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="p : ${positionsList}">
+            <td th:text="${p.code}"></td>
+            <td th:text="${p.evaluation}"></td>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+</script>
+</body>
+</html>
